@@ -26,13 +26,17 @@ def newState(year):
 
         #this next section will work based on a seperate list of filesizes/amount of lines in a file.
         #getLineAmountFromID(numbers)
-        lineamount = 100
+        lineamount = 50
         if(lineamount < 100):
-            #use 3 numbers, recursively reduce
+            #use 2 numbers, recursively reduce (by max)
         if(lineamount < 1000):
-            #use 4 numbers, recursively reduce
+            #use 3 numbers, recursively reduce
         if(lineamount < 10000)
+            #use 4 numbers, recursively reduce
+        if(lineamount < 100000)
             #use 5 numbers, recursively reduce
+        else:
+            #use 6 numbers,recursively reduce
         #etc, some countries are consideraby larger files than the rest, so may get a specifc generator.
         
         
