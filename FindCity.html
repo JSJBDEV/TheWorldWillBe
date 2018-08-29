@@ -1,0 +1,22 @@
+<html>
+<head></head>
+<body>
+<script>
+var allstring = "";
+fetch('http://jsjbdev.github.io/twwb/af.txt')
+  .then(function(response) {
+    return response.text();
+  }).then(function(text) { 
+  	// <!DOCTYPE ....
+  	//console.log(text); 
+	allstring = text.split("\n");
+	test();
+  });
+ function test()
+ {
+	console.log(allstring[53561]);
+ }
+ 
+</script>
+</body>
+</html>
