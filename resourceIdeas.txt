@@ -1,0 +1,12 @@
+Country;
+1.1x on certain resources
+Region;
+1.5x on certain resoures
+Town;
+Resources
+
+Resource List
+- Wood, Lumbermill
+- Minerals, Mine
+- crops, Crop Farm
+- Livestock, Livestock Farm

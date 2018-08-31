@@ -17,7 +17,7 @@ def newState(year):
     print(numbers)
     if(numbers > 70):
         print("new state formed")
-        numbers = int(str(ynum)[1:4]) #the second and third, hence a number between 000 and 999 inclusive.
+        numbers = int(str(ynum)[1:4]) #hence a number between 000 and 999 inclusive.
         if(numbers == 000):
             numbers = 1000
         while(numbers>235):
@@ -43,3 +43,4 @@ def newState(year):
         
 for i in range(100):
     newState(i)
+
