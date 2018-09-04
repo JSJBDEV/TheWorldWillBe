@@ -1,0 +1,96 @@
+ Antigua and Barbuda	Two main islands	Continental shelf	86,295	440	194	Caribbean Sea, Leeward Islands
+ Australia	Two main islands	Continental shelf	24,309,330	7,692,000	3.2	Oceania
+ Bahamas	Archipelago	Continental shelf	392,000	13,878	23.27	Atlantic Ocean, Bahamas
+ Bahrain	One main island	Continental shelf	1,316,500	750	1,189.5	Persian Gulf
+ Barbados	One island	Continental shelf	285,000	430	627	Caribbean Sea, Windward Islands
+ Brunei	Part of a larger island	Continental shelf	393,372	5,765	67.3	Maritime Southeast Asia
+ Cape Verde	Archipelago	Oceanic	518,467	4,033	125.5	Atlantic Ocean, Africa
+ Comoros	Archipelago	Oceanic	784,745	2,235	275	Indian Ocean, Africa
+ Cuba	One main island	Continental shelf	11,245,629	109,238	102.3	Caribbean Sea, Greater Antilles
+ Cyprus[n 1]	Part of a larger island	Continental shelf	858,000	9,251	85	Mediterranean Sea
+ Dominica	One main island	Continental shelf	71,293	754	105	Caribbean Sea, Lesser Antilles
+ Dominican Republic	Part of a larger island	Continental shelf	10,652,000	48,442	208.2	Caribbean Sea, Greater Antilles
+ East Timor	Part of a larger island	Continental shelf	1,212,107	14,874	76.2	Maritime Southeast Asia
+ Federated States of Micronesia	Archipelago	Oceanic	101,351	702	158.1	Pacific Ocean, Micronesia
+ Fiji	Archipelago	Oceanic	859,178	18,274	46.4	Pacific Ocean, Melanesia
+ Grenada, Carriacou and Petite Martinique	One main island, two dependencies	Continental shelf	110,000	344	319.8	Caribbean Sea, Windward Islands
+ Haiti	Part of a larger island	Continental shelf	9,700,000	27,750	350	Caribbean Sea, Greater Antilles
+ Iceland	One main island	Oceanic	316,252	103,000	3.1	Atlantic Ocean
+ Indonesia	Archipelago	Two continental shelves	255,461,700	1,904,569	124.7	Maritime Southeast Asia
+ Republic of Ireland	Part of a larger island	Continental shelf	4,588,252	70,273	65.3	Atlantic Ocean, British Isles
+ Jamaica	One main island	Continental shelf	2,847,232	10,991	252	Caribbean Sea, Greater Antilles
+ Japan	Archipelago	Continental shelf	127,433,494	377,873	337	Pacific Ocean, East Asia
+ Kiribati	Archipelago	Oceanic	98,000	811	135	Pacific Ocean, Micronesia
+ Madagascar	One main island	Oceanic	20,653,556	587,041	35.2	Indian Ocean, Africa
+ Maldives	Archipelago	Oceanic	329,198	298	1,105	Indian Ocean
+ Malta	Two main islands	Continental shelf	404,500	316	1,282	Mediterranean Sea
+ Marshall Islands	Archipelago	Oceanic	62,000	181	342.5	Pacific Ocean, Micronesia
+ Mauritius	Archipelago	Oceanic	1,244,663	2,040	610	Indian Ocean, Africa
+ Nauru	One island	Oceanic	13,635	21	649	Pacific Ocean, Micronesia
+ New Zealand	Two main islands	Continental shelf	4,691,194	268,680	17.4	Pacific Ocean, Polynesia
+ Northern Cyprus[n 2]	Part of a larger island	Continental shelf	313,626[3]	3,355	93	Mediterranean Sea
+ Palau	Archipelago	Oceanic	20,000	459	43.6	Pacific Ocean, Micronesia
+ Papua New Guinea	Part of a larger island	Continental shelf	6,732,000	462,840	14.5	Pacific Ocean, Melanesia
+ Philippines	Archipelago	Continental shelf	101,398,120	343,448	295	Maritime Southeast Asia
+ Saint Kitts and Nevis	Two main islands	Continental shelf	51,300	261	164	Caribbean Sea, Leeward Islands
+ Saint Lucia	One main island	Continental shelf	173,765	616	298	Caribbean Sea, Windward Islands
+ Saint Vincent and the Grenadines	Archipelago	Continental shelf	120,000	389	307	Caribbean Sea, Windward Islands
+ Samoa	Archipelago	Oceanic	179,000	2,831	63.2	Pacific Ocean, Polynesia
+ São Tomé and Príncipe	Two main islands	Continental shelf	163,000	1,001	169.1	Atlantic Ocean, Africa
+ Seychelles	Archipelago	Oceanic	87,500	455	192	Indian Ocean, Africa
+ Singapore[4]	One main island	Continental shelf	5,469,700	718.3	7,615	Maritime Southeast Asia
+ Solomon Islands	Archipelago	Oceanic	523,000	28,400	18.1	Pacific Ocean, Melanesia
+ Sri Lanka	One main island	Continental shelf	20,277,597	65,610	314	Indian Ocean
+ Taiwan[n 3]	One main island	Continental shelf	23,550,077	36,188	633	Pacific Ocean, East Asia
+ Tonga	Archipelago	Oceanic	104,000	748	139	Pacific Ocean, Polynesia
+ Trinidad and Tobago	Two main islands	Continental shelf	1,299,953	5,131	254.4	Caribbean Sea, South America
+ Tuvalu	Archipelago	Oceanic	12,373	26	475.88	Pacific Ocean, Polynesia
+ United Kingdom	One main island; part of second island	Continental shelf	65,587,300	244,820	246	Atlantic Ocean, British Isles
+ Vanuatu	Archipelago	Oceanic	243,304	12,190	19.7	Pacific Ocean, Melanesia
+
+ Akrotiri and Dhekelia	Part of a larger island	Continental shelf	 United Kingdom	15,700	254	N/A	Mediterranean sea
+ Åland[n 4]	Archipelago	Continental shelf	 Finland	28,355	1,580	17.9	Baltic Sea, Gulf of Bothnia
+ American Samoa[n 5]	Archipelago	Oceanic	 United States	54,947	199	276	Pacific ocean, Polynesia
+ Anguilla	One main island	Continental shelf	 United Kingdom	15,423	91	169	Caribbean Sea, Leeward Islands
+ Aruba	One Island	Continental shelf	 Netherlands	107,635	180	598	Caribbean Sea, Leeward Antilles
+ Bermuda	Archipelago	Oceanic	 United Kingdom	62,500	53.3	1,170	Atlantic Ocean, North America
+ British Indian Ocean Territory	Archipelago	Oceanic	 United Kingdom	3,000	54,400	0.05	Indian ocean
+ British Virgin Islands	Archipelago	Continental shelf	 United Kingdom	31,148	151	206	Caribbean Sea, Leeward Islands
+ Caribbean Netherlands	Three main islands	Continental shelf	 Netherlands	21,133	127	166	Caribbean Sea
+ Cayman Islands	Three islands	Continental shelf	 United Kingdom	52,560	264	199	Caribbean Sea, Greater Antilles
+ Christmas Island	One main island	Oceanic	 Australia	1,496	135	11.1	Maritime Southeast Asia
+ Cocos (Keeling) Islands	Two main islands	Oceanic	 Australia	596	14	42.6	Maritime Southeast Asia
+ Cook Islands[n 6]	Archipelago	Oceanic	 New Zealand	10,777	236	45.7	Pacific Ocean, Polynesia
+ Curaçao	One main island	Continental shelf	 Netherlands	145,834	444	328	Caribbean Sea, Leeward Antilles
+ Easter Island	One Island	Oceanic	 Chile	6,148	163.6	N/A	Pacific ocean, Polynesia
+ Falkland Islands	Two main islands	Continental shelf	 United Kingdom[n 7]	3,140	12,173	0.26	Atlantic Ocean, South America
+ Faroe Islands	Archipelago		 Denmark	49,483	1,393	35.5	Atlantic Ocean
+ French Polynesia	Archipelago	Oceanic	 France	274,512	3,827	71.7	Pacific Ocean, Polynesia
+ Greenland	One main island with archipelagos	Continental shelf	 Denmark	57,695	2,166,086	0.03	North America
+ Guadeloupe	One main island	Continental Shelf	 France	405,500	1,628	250	Caribbean Sea, Leeward Islands
+ Guam[n 5]	One Island	Oceanic	 United States	159,914	544	293	Pacific Ocean, Micronesia
+ Guernsey[n 8][5]	Three main islands	Continental shelf	Royal Arms of England (1603-1707).svgBritish Crown	65,849	78	844	English Channel, Channel Islands
+ Isle of Man[n 9][6]	One main island	Continental shelf	Arms of the United Kingdom.svgBritish Crown	85,421	572	149	Irish Sea, British Isles
+ Jersey[n 10][7]	One main island	Continental shelf	Royal Arms of England (1603-1707).svgBritish Crown	94,949	116	819	English Channel, Channel Islands
+ Martinique	One island	Continental shelf	 France	403,795	1,128	360	Caribbean Sea, Leeward Islands
+ Mayotte	One main island		 France	194,000	374	498.5	Indian Ocean, Africa
+ Montserrat	One main island	Continental shelf	 United Kingdom	5,164	102	50.6	Caribbean Sea, Leeward Islands
+ Navassa Island	One main island	Continental shelf	 United States[n 11]	Uninhabited	5.4	N/A	Caribbean Sea, Greater Antilles
+ New Caledonia	One main island	Continental shelf	 France	260,166	18,275	14.2	Pacific Ocean, Melanesia
+ Niue[n 6]	One Island	Oceanic	 New Zealand	1,269	260	4.9	Pacific Ocean, Polynesia
+ Norfolk Island	One main island		 Australia	2,182	36	60.6	Pacific Ocean, Melanesia
+ Northern Mariana Islands[n 5]	Archipelago	Oceanic	 United States	51,395	464	111	Pacific Ocean, Micronesia
+ Pitcairn Islands	Archipelago	Oceanic	 United Kingdom	48	47	1.0	Pacific Ocean, Polynesia
+ Puerto Rico[n 5]	One main island	Continental shelf	 United States	3,690,923	8,870	416	Caribbean Sea, Greater Antilles
+ Réunion	One main island		 France	893,500	2,512	330	Indian Ocean, Africa
+ Saint Barthélemy	One main island	Continental shelf	 France	7,332	21	349	Caribbean Sea, Leeward Islands
+ Saint Helena, Ascension and Tristan da Cunha	Three main islands distant from each other	Oceanic	 United Kingdom	7,728	308	25.1	Atlantic Ocean
+ Collectivity of Saint Martin	Part of a larger island	Continental shelf	 France	30,959	54.4	569	Caribbean Sea, Leeward Islands
+ Saint Pierre and Miquelon	Two main islands	Continental shelf	 France	5,831	242	24.1	North America
+ Sint Maarten	Part of a larger island	Continental shelf	 Netherlands	39,088	34	1,150	Caribbean Sea, Leeward Islands
+ South Georgia and the South Sandwich Islands	Archipelago	Continental shelf	 United Kingdom[n 7]	30	3,903	0.008	Atlantic Ocean
+ Svalbard[n 12]	Archipelago		 Norway	2,752	62,045	0.03	Arctic Ocean
+ Tokelau[n 6]	Archipelago	Oceanic	 New Zealand	1,368	12	114	Pacific Ocean, Polynesia
+ Turks and Caicos Islands	Archipelago	Continental shelf	 United Kingdom	46,335	948	48.9	Caribbean Sea, Greater Antilles
+ U.S. Virgin Islands[n 5]	Archipelago	Continental shelf	 United States	105,275	346	304	Caribbean Sea, Leeward Islands
+ Wallis and Futuna	Three main islands	Oceanic	 France	15,289	264	57.9	Pacific Ocean, Polynesia
