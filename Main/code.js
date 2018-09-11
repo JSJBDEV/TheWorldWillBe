@@ -53,6 +53,7 @@ function removeMarker(id)
 //--------------------------------------non map things------------------------//
 var ResDomain = "http://jsjbdev.github.io/twwb/"
 var loadedRes = [];
+var taskQueue = [];
 
 function getFile(url) //using a simple fetch method I can grab my libraries.
 {
@@ -65,6 +66,7 @@ fetch(ResDomain+url)
 });
 	
 }
+
 
 function baseGenerator(year)
 {
@@ -87,19 +89,44 @@ function fitRecursively(input,limit)
 	}
 	return input;
 }
+function loadYear(year)
+{
+	getFile("numberofcities.txt");
+	setTimeout(doYear,2000,year);
+}
 
 function doYear(year)
 {
+	
 	var seed = ""+baseGenerator(year);
 	console.log(seed);
 	if(parseInt(seed.substring(0,2))> 70)
 	{
 		var countryId = fitRecursively(parseInt(seed.substring(1,4)),235);
-		var countries = getFile("numberofcities.txt");
-		var countryReference = countries[countryId-1];
-		console.log(countries);
+		
+		var countryReference = loadedRes[countryId-1];
+		console.log(loadedRes);
+		console.log(countryReference);
 		return countryReference;
 		
 	}
 	
+}
+
+//due to the asynchronous nature of importing a file there is 2 possible ways of using the data; either I convert my big data set to .js readable files or use a quee based system for laoding resources.
+function proccessQueueItem()
+{
+	switch(taskQueue[0])
+	{
+		case "getResource":
+			taskQueue.shift();
+			var resource = taskQueue.shift();
+			getFile(resource);
+			break;
+		case "genCountryFromYear":
+			taskQueue.shift();
+			var year = parseInt(taskQueue.shift());
+			doYear(year);
+		
+	}
 }
