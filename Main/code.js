@@ -1,5 +1,6 @@
 var markers = [];
 var polygons = [];
+var polylines = [];
 var map = L.map('map', {
 	minZoom: 2,
 	maxZoom: 9,
@@ -13,10 +14,11 @@ var positron = L.tileLayer('http://s3.amazonaws.com/com.modestmaps.bluemarble/{z
 }).addTo(map);
 
 var myIcon = L.icon({
-iconUrl: 'http://flag-designer.appspot.com/gwtflags/SvgFileService?d=0&c1=5&c2=3&c3=6&o=2&c4=5&s=13&c5=1',
-iconSize: [60,40],
-iconAnchor: [30, 20],
-popupAnchor: [0, -5],
+	//#d=11&c1=7&c2=7&c3=7&o=11&c4=7&s=17&c5=7 (highest values)
+	iconUrl: 'http://flag-designer.appspot.com/gwtflags/SvgFileService?d=0&c1=5&c2=3&c3=6&o=2&c4=5&s=13&c5=1',
+	iconSize: [60,40],
+	iconAnchor: [30, 20],
+	popupAnchor: [0, -5],
 	});
 map.setView([0, 0], 0);
 
@@ -32,6 +34,17 @@ function addPolygon(latlngs,colour)
 	polygons.push(polygon);
 	return polygon;
 	
+}
+function addPolyline(latlngs,colour)
+{
+	var polyline = L.polyline(latlngs, {color: colour}).addTo(map);
+	polylines.push(polyline)
+	
+}
+function removePolyline(id)
+{
+	map.removeLayer(polylines[id]);
+	polylines.splice(id);
 }
 function removePolygon(id)
 {
@@ -53,6 +66,7 @@ function removeMarker(id)
 //--------------------------------------non map things------------------------//
 var ResDomain = "http://jsjbdev.github.io/twwb/"
 var loadedRes = [];
+var taskResponse = "";
 var taskQueue = [];
 
 function getFile(url) //using a simple fetch method I can grab my libraries.
@@ -95,20 +109,14 @@ function loadYear(year)
 	setTimeout(doYear,2000,year);
 }
 
-function doYear(year)
+function getIDforYear(year)
 {
 	
 	var seed = ""+baseGenerator(year);
 	console.log(seed);
 	if(parseInt(seed.substring(0,2))> 70)
 	{
-		var countryId = fitRecursively(parseInt(seed.substring(1,4)),235);
-		
-		var countryReference = loadedRes[countryId-1];
-		console.log(loadedRes);
-		console.log(countryReference);
-		return countryReference;
-		
+		taskResponse = fitRecursively(parseInt(seed.substring(1,4)),235);
 	}
 	
 }
@@ -123,10 +131,17 @@ function proccessQueueItem()
 			var resource = taskQueue.shift();
 			getFile(resource);
 			break;
-		case "genCountryFromYear":
+		case "getCountryIdFromYear":
 			taskQueue.shift();
 			var year = parseInt(taskQueue.shift());
-			doYear(year);
+			getIDforYear(year);
+			break;
+		case "getTownsInCountryFromId"
+			taskQueue.shift();
+			var compound = loadedRes.split(",");
+			taskResponse = compound[0];
+			
+			
 		
 	}
 }
