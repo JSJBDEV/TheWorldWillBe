@@ -68,6 +68,8 @@ var ResDomain = "http://jsjbdev.github.io/twwb/"
 var loadedRes = [];
 var taskResponse = "";
 var taskQueue = [];
+var seed = 0;
+var towns = [];
 
 function getFile(url) //using a simple fetch method I can grab my libraries.
 {
@@ -84,7 +86,7 @@ fetch(ResDomain+url)
 
 function baseGenerator(year)
 {
-	var seed = 1;
+	seed = 1;
 	const A = 234233466321;
 	const B = 785432575563;
 	const M = 924314325657;
@@ -112,36 +114,76 @@ function loadYear(year)
 function getIDforYear(year)
 {
 	
-	var seed = ""+baseGenerator(year);
-	console.log(seed);
-	if(parseInt(seed.substring(0,2))> 70)
+	var tseed = ""+baseGenerator(year);
+	console.log(tseed);
+	if(parseInt(tseed.substring(0,2))> 70)
 	{
-		taskResponse = fitRecursively(parseInt(seed.substring(1,4)),235);
+		taskResponse = fitRecursively(parseInt(tseed.substring(1,4)),235);
 	}
 	
 }
 
-//due to the asynchronous nature of importing a file there is 2 possible ways of using the data; either I convert my big data set to .js readable files or use a quee based system for laoding resources.
+
+//due to the asynchronous nature of importing a file there is 2 possible ways of using the data; either I convert my big data set to .js readable files or use a quee based system for loading resources.
 function proccessQueueItem()
 {
-	switch(taskQueue[0])
+	switch(taskQueue[0])//REQUIRES = R: OUTPUTS= O:
 	{
-		case "getResource":
+		case "getResource": //R:FileUrl O:File From URL
 			taskQueue.shift();
 			var resource = taskQueue.shift();
 			getFile(resource);
 			break;
-		case "getCountryIdFromYear":
+			
+		case "getCountryIdFromYear": // R: Year O: Country ID
 			taskQueue.shift();
 			var year = parseInt(taskQueue.shift());
 			getIDforYear(year);
 			break;
-		case "getTownsInCountryFromId"
+			
+		//----Below this line all tasks take global inputs, such as seed or Country File----//	
+		
+		case "getTownsInCountryFromId": //R: Country ID O: Number of Towns
 			taskQueue.shift();
-			var compound = loadedRes.split(",");
+			var compound = loadedRes[taskResponse];
+			compound = compound.split(",");
+			taskResponse = compound[1];
+			break;
+			
+		case "getCountryCodeFromId": //R: Country ID O: Country Code
+			taskQueue.shift();
+			var compound = loadedRes[taskResponse];
+			compound = compound.split(",");
 			taskResponse = compound[0];
+			break;
 			
 			
+		case "pickTown": //R: Number of Towns, seed, Country File),  O: A Town
+			taskQueue.shift();
+			var tseed = ""+seed;
+			tseed = tseed.substring(2,9);
+			var townEquiv = fitRecursively(parseInt(tseed),taskResponse); //Number Of Towns
+			taskResponse = loadedRes[townEquiv];
+			break;
+		
+		case "startCiv": //R: A Town O: A Civilisation Object.
+		taskQueue.shift();
+		var compound = taskResponse.split(",");
+		towns.push(new Town(compound[0],compound[2],compound[3],[compound[5],compound[6]))
 		
 	}
+}
+
+function town(realCountry,realName,realRegion,latitude,longitude) //magical town object, will contain all information about the town.
+{
+	this.realCountry = realCountry;
+	this.realRegion = realRegion;
+	this.realName = realName;
+	this.latitude = latitude;
+	this.longitude = longitude;
+	
+}
+function getTownByRealName(name)
+{
+	return towns.find(x => x.realName === name);
 }
