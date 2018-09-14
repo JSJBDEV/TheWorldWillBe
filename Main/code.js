@@ -166,15 +166,15 @@ function proccessQueueItem()
 			taskResponse = loadedRes[townEquiv];
 			break;
 		
-		case "startCiv": //R: A Town O: A Civilisation Object.
+		case "startCiv": //R: A Town O: A Civilisation Object (returing its position in the array)
 		taskQueue.shift();
 		var compound = taskResponse.split(",");
-		towns.push(new Town(compound[0],compound[2],compound[3],[compound[5],compound[6]))
+		taskResponse = towns.push(new Town(compound[0],compound[2],compound[3],[compound[5],compound[6]))-1;
 		
 	}
 }
 
-function town(realCountry,realName,realRegion,latitude,longitude) //magical town object, will contain all information about the town.
+function Town(realCountry,realName,realRegion,latitude,longitude) //magical town object, will contain all information about the town.
 {
 	this.realCountry = realCountry;
 	this.realRegion = realRegion;
