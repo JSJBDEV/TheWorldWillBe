@@ -64,9 +64,10 @@ function removeMarker(id)
 	markers.splice(id);
 }
 //--------------------------------------non map things------------------------//
-var ResDomain = "http://jsjbdev.github.io/twwb/"
+var ResDomain = "http://jsjbdev.github.io/world/"
 var loadedRes = [];
 var taskResponse = "";
+var countryId = 0;
 var taskQueue = [];
 var seed = 0;
 var towns = [];
@@ -99,7 +100,7 @@ function baseGenerator(year)
 
 function fitRecursively(input,limit)
 {
-	while(input>limit)
+	while(input>=limit)
 	{
 		input = input - limit;
 	}
@@ -118,7 +119,11 @@ function getIDforYear(year)
 	console.log(tseed);
 	if(parseInt(tseed.substring(0,2))> 70)
 	{
-		taskResponse = fitRecursively(parseInt(tseed.substring(1,4)),235);
+		countryId = fitRecursively(parseInt(tseed.substring(1,4)),235);
+	}
+	else
+	{
+		taskQueue = [];
 	}
 	
 }
@@ -127,12 +132,12 @@ function getIDforYear(year)
 //due to the asynchronous nature of importing a file there is 2 possible ways of using the data; either I convert my big data set to .js readable files or use a quee based system for loading resources.
 function proccessQueueItem()
 {
+	document.getElementById("taskdisplay").innerHTML = taskQueue;
 	switch(taskQueue[0])//REQUIRES = R: OUTPUTS= O:
 	{
-		case "getResource": //R:FileUrl O:File From URL
+		case "loadCityNumbers": //R:FileUrl O:File From URL
 			taskQueue.shift();
-			var resource = taskQueue.shift();
-			getFile(resource);
+			getFile("numberofcities.txt");
 			break;
 			
 		case "getCountryIdFromYear": // R: Year O: Country ID
@@ -143,33 +148,43 @@ function proccessQueueItem()
 			
 		//----Below this line all tasks take global inputs, such as seed or Country File----//	
 		
-		case "getTownsInCountryFromId": //R: Country ID O: Number of Towns
+		case "getTownsInCountryFromId": //R: Country ID O: Number of Towns (task)
 			taskQueue.shift();
-			var compound = loadedRes[taskResponse];
+			var compound = loadedRes[parseInt(countryId)];
 			compound = compound.split(",");
 			taskResponse = compound[1];
+			console.log(taskResponse);
 			break;
 			
-		case "getCountryCodeFromId": //R: Country ID O: Country Code
+		case "getCountryCodeFromId": //R: Country ID O: Country Code (task)
 			taskQueue.shift();
-			var compound = loadedRes[taskResponse];
+			var compound = loadedRes[parseInt(countryId)];
 			compound = compound.split(",");
 			taskResponse = compound[0];
+			console.log(taskResponse);
+			break;
+		
+		case "loadCountryFromTask": //R: Country ID: O: Country file
+			taskQueue.shift();
+			var compound = loadedRes[parseInt(countryId)];
+			compound = compound.split(",");
+			getFile("countries/"+compound[0]+".txt");
 			break;
 			
-			
-		case "pickTown": //R: Number of Towns, seed, Country File),  O: A Town
+		case "pickTown": //R: Number of Towns (task), seed, Country File,  O: A Town (task)
 			taskQueue.shift();
 			var tseed = ""+seed;
 			tseed = tseed.substring(2,9);
-			var townEquiv = fitRecursively(parseInt(tseed),taskResponse); //Number Of Towns
+			var townEquiv = fitRecursively(parseInt(tseed),parseInt(taskResponse)); //Number Of Towns
+			console.log(townEquiv);
 			taskResponse = loadedRes[townEquiv];
 			break;
 		
-		case "startCiv": //R: A Town O: A Civilisation Object (returing its position in the array)
-		taskQueue.shift();
-		var compound = taskResponse.split(",");
-		taskResponse = towns.push(new Town(compound[0],compound[2],compound[3],[compound[5],compound[6]))-1;
+		case "startCiv": //R: A Town (task) O: A Civilisation Object (returing its position in the array) (task)
+			taskQueue.shift();
+			var compound = taskResponse.split(",");
+			taskResponse = towns.push(new Town(compound[0],compound[1],compound[3],compound[5],compound[6]));
+			break;
 		
 	}
 }
@@ -181,9 +196,20 @@ function Town(realCountry,realName,realRegion,latitude,longitude) //magical town
 	this.realName = realName;
 	this.latitude = latitude;
 	this.longitude = longitude;
+	addMarker(latitude,longitude,realName);
 	
 }
 function getTownByRealName(name)
 {
 	return towns.find(x => x.realName === name);
 }
+
+function genDefaultTasks(year)
+{
+	taskQueue = ["loadCityNumbers","getCountryIdFromYear",year,"getTownsInCountryFromId","loadCountryFromTask","pickTown","startCiv"]
+}
+function simYear()
+{
+	genDefaultTasks(document.getElementById("numberbox").value);
+}
+setInterval(proccessQueueItem,1000);
