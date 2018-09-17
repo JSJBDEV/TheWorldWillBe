@@ -136,7 +136,7 @@ function proccessQueueItem()
 	document.getElementById("taskdisplay").innerHTML = taskQueue;
 	switch(taskQueue[0])//REQUIRES = R: OUTPUTS= O:
 	{
-		case "loadCityNumbers": //R:FileUrl O:File From URL
+		case "loadCityNumbers": //R:FileUrl O: Numbers File
 			
 			getFile("numberofcities.txt");
 			shiftIfSuccess();
@@ -169,15 +169,29 @@ function proccessQueueItem()
 			shiftIfSuccess();
 			break;
 		
-		case "loadCountryFromTask": //R: Country ID: O: Country file
+		case "loadCountryFromID": //R: Country ID, Numbers File: O: Country file (Resource)
 			
 			var compound = loadedRes[parseInt(countryId)];
 			compound = compound.split(",");
 			getFile("countries/"+compound[0]+".txt");
 			shiftIfSuccess();
 			break;
+		case "loadCountryFromCode": //R Country Code (next) o: Country File (Resource)
+			taskQueue.shift();
+			getFile("countries/"+taskQueue.shift()+".txt");
 			
-		case "pickTown": //R: Number of Towns (task), seed, Country File,  O: A Town (task)
+		
+		case "getRegionInCountry": //R: Country File, Region (next) O: Region in country (Resource)
+			taskQueue.shift();
+			loadedRes = loadedRes.filter(findTownsInRegion,taskQueue.shift());
+			break;
+			
+		case "getTownsInList": //R: Country/Region File O: Number of Towns
+			taskResponse = loadedRes.length;
+			shiftIfSuccess();
+			
+			
+		case "pickTown": //R: Number of Towns (task), seed, Country/Region File,  O: A Town (task)
 			
 			var tseed = ""+seed;
 			tseed = tseed.substring(2,9);
@@ -193,6 +207,11 @@ function proccessQueueItem()
 			taskResponse = towns.push(new Town(compound[0],compound[1],compound[3],compound[5],compound[6]));
 			shiftIfSuccess();
 			break;
+		case "checkCivs":
+			towns.forEach(townIterate);
+			taskQueue.shift();
+			break;
+			
 		
 	}
 
@@ -206,8 +225,9 @@ function shiftIfSuccess()
 }
 //---------------------Towns--------------------//
 function Town(realCountry,realName,realRegion,latitude,longitude) //magical town object, will contain all information about the town.
-{
+{	this.foundedYear = currentYear;
 	this.realCountry = realCountry;
+	this.realCountryID = countryId;
 	this.realRegion = realRegion;
 	this.realName = realName;
 	this.latitude = latitude;
@@ -221,18 +241,42 @@ function getTownByRealName(name)
 }
 function generateTownPage(town)
 {
-	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry;
+	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear;
 }
 //----------------------------------------------//
 function genDefaultTasks()
 {
-	taskQueue = ["loadCityNumbers","getCountryIdFromYear","getTownsInCountryFromId","loadCountryFromTask","pickTown","startCiv"]
+	taskQueue = ["loadCityNumbers","getCountryIdFromYear","getTownsInCountryFromId","loadCountryFromID","pickTown","startCiv","checkCivs"]
+	
 }
 function simYear()
 {
 	currentYear = document.getElementById("numberbox").value
 	genDefaultTasks();
+	
 }
+function townIterate(town)
+{
+	var tseed = ""+seed;
+	console.log("t:"+tseed.substring(4,6));
+	if(tseed.substring(4,6) >= 80)
+	{
+		countryId = town.realCountryID;
+		taskQueue.push("loadCountryFromCode",town.realCountry,"getRegionInCountry",town.realRegion,"pickTown","startCiv");
+		
+	}
+}
+
+function findTownsInRegion(town,region) //assumes that the loaded country is the country to be searched
+{
+	if(town.split(",")[3] == region)
+	{
+		return true;
+	}
+}
+
+
+
 if(typeof(Storage) === undefined)
 {
 	document.getElementById("numberbox").innerHTML = "use a newer browser otherwise no data will be saved!";
