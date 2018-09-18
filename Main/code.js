@@ -146,6 +146,7 @@ function proccessQueueItem()
 			
 			var year = parseInt(currentYear);
 			getIDforYear(year);
+			lastTown = "none";
 			shiftIfSuccess();
 			break;
 			
@@ -179,11 +180,13 @@ function proccessQueueItem()
 		case "loadCountryFromCode": //R Country Code (next) o: Country File (Resource)
 			taskQueue.shift();
 			getFile("countries/"+taskQueue.shift()+".txt");
-			
+			break;
 		
 		case "getRegionInCountry": //R: Country File, Region (next) O: Region in country (Resource)
 			taskQueue.shift();
-			loadedRes = loadedRes.filter(findTownsInRegion,taskQueue.shift());
+			var regionRes = loadedRes.filter(findTownsInRegion);
+			loadedRes = regionRes;
+			shiftIfSuccess();
 			break;
 			
 		case "getTownsInList": //R: Country/Region File O: Number of Towns
@@ -201,16 +204,23 @@ function proccessQueueItem()
 			shiftIfSuccess();
 			break;
 		
-		case "startCiv": //R: A Town (task) O: A Civilisation Object (returing its position in the array) (task)
+		case "startCiv": //R: A Town (task) O: A Civilisation Object (returing the town added) (task)
 			
 			var compound = taskResponse.split(",");
-			taskResponse = towns.push(new Town(compound[0],compound[1],compound[3],compound[5],compound[6]));
+			towns.push(new Town(compound[0],compound[1],compound[3],compound[5],compound[6]));
+			taskResponse = towns[towns.length-1];
+			
 			shiftIfSuccess();
 			break;
-		case "checkCivs":
+		case "checkCivs": //UTILITY O: tasks for town expansion
 			towns.forEach(townIterate);
 			taskQueue.shift();
 			break;
+		case "checkConnections": //R: A new town (from startCiv), The original town (from next) O: draw lines in nations.
+			taskQueue.shift()
+			var oldTown = taskQueue.shift();
+			addPolyline([[taskResponse.latitude,taskResponse.longitude],[oldTown.latitude,oldTown.longitude]],"red");
+			
 			
 		
 	}
@@ -227,12 +237,11 @@ function shiftIfSuccess()
 function Town(realCountry,realName,realRegion,latitude,longitude) //magical town object, will contain all information about the town.
 {	this.foundedYear = currentYear;
 	this.realCountry = realCountry;
-	this.realCountryID = countryId;
 	this.realRegion = realRegion;
 	this.realName = realName;
 	this.latitude = latitude;
 	this.longitude = longitude;
-	addMarker(latitude,longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+realName+'"'+"))'>"+realName+"</a>");
+	addMarker(latitude,longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+realName+'"'+"))'>"+realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d=0&c1=5&c2=3&c3=6&o=2&c4=5&s=13&c5=1' alt='svg' width='60' height='40'/>");
 	
 }
 function getTownByRealName(name)
@@ -241,12 +250,12 @@ function getTownByRealName(name)
 }
 function generateTownPage(town)
 {
-	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear;
+	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion;
 }
 //----------------------------------------------//
 function genDefaultTasks()
 {
-	taskQueue = ["loadCityNumbers","getCountryIdFromYear","getTownsInCountryFromId","loadCountryFromID","pickTown","startCiv","checkCivs"]
+	taskQueue = ["loadCityNumbers","getCountryIdFromYear","getTownsInCountryFromId","loadCountryFromID","pickTown","startCiv","checkCivs"];
 	
 }
 function simYear()
@@ -261,17 +270,19 @@ function townIterate(town)
 	console.log("t:"+tseed.substring(4,6));
 	if(tseed.substring(4,6) >= 80)
 	{
-		countryId = town.realCountryID;
-		taskQueue.push("loadCountryFromCode",town.realCountry,"getRegionInCountry",town.realRegion,"pickTown","startCiv");
-		
+		taskQueue.push("loadCountryFromCode",town.realCountry,"getRegionInCountry",town.realRegion,"getTownsInList","pickTown","startCiv","checkConnections",town);
 	}
 }
 
-function findTownsInRegion(town,region) //assumes that the loaded country is the country to be searched
+function findTownsInRegion(town) //assumes that the loaded country is the country to be searched
 {
-	if(town.split(",")[3] == region)
+	if(town.split(",")[3] == taskQueue[0])
 	{
 		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
