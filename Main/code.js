@@ -20,6 +20,20 @@ var myIcon = L.icon({
 	iconAnchor: [30, 20],
 	popupAnchor: [0, -5],
 	});
+	
+var subTownIcon = L.icon({
+	iconUrl: 'http://clipart.nicubunu.ro/svg/rpg_map/farm.svg',
+	iconSize: [60,50],
+	iconAnchor: [30, 20],
+	popupAnchor: [0, -5],});
+	
+var mainTownIcon = L.icon({
+	iconUrl: 'http://clipart.nicubunu.ro/svg/rpg_map/fort.svg',
+	iconSize: [60,50],
+	iconAnchor: [30, 20],
+	popupAnchor: [0, -5],});
+
+
 map.setView([0, 0], 0);
 
  L.marker([-10.4333333,105.6833333]).addTo(map)
@@ -54,7 +68,7 @@ function removePolygon(id)
 
 function addMarker(lat,lon,desc)
 {
-	var marker = L.marker([lat,lon],{icon: myIcon}).addTo(map).bindPopup(desc);
+	var marker = L.marker([lat,lon],{icon: mainTownIcon}).addTo(map).bindPopup(desc);
 	markers.push(marker);
 	return markers;
 }
@@ -124,7 +138,7 @@ function getIDforYear(year)
 	}
 	else
 	{
-		taskQueue = [];
+		taskQueue.splice(0,4);
 	}
 	
 }
@@ -216,10 +230,11 @@ function proccessQueueItem()
 			towns.forEach(townIterate);
 			taskQueue.shift();
 			break;
-		case "checkConnections": //R: A new town (from startCiv), The original town (from next) O: draw lines in nations.
+		case "checkConnections": //R: A new town (task from startCiv), The original town (from next) O: draw lines in nations.
 			taskQueue.shift()
 			var oldTown = taskQueue.shift();
-			addPolyline([[taskResponse.latitude,taskResponse.longitude],[oldTown.latitude,oldTown.longitude]],"red");
+			taskResponse.branchedFrom = oldTown.realName;
+			addPolyline([[taskResponse.latitude,taskResponse.longitude],[oldTown.latitude,oldTown.longitude]],getTownColour(oldTown));
 			
 			
 		
@@ -241,6 +256,10 @@ function Town(realCountry,realName,realRegion,latitude,longitude) //magical town
 	this.realName = realName;
 	this.latitude = latitude;
 	this.longitude = longitude;
+	this.townseed = baseGenerator(222+towns.length);
+	this.population = 1;
+	this.devLevel = 10;
+	this.branchedFrom = "N/A";
 	addMarker(latitude,longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+realName+'"'+"))'>"+realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d=0&c1=5&c2=3&c3=6&o=2&c4=5&s=13&c5=1' alt='svg' width='60' height='40'/>");
 	
 }
@@ -250,7 +269,7 @@ function getTownByRealName(name)
 }
 function generateTownPage(town)
 {
-	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion;
+	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion+"<br> Population: "+town.population+"<br> Branched From: "+town.branchedFrom;
 }
 //----------------------------------------------//
 function genDefaultTasks()
@@ -266,12 +285,14 @@ function simYear()
 }
 function townIterate(town)
 {
-	var tseed = ""+seed;
-	console.log("t:"+tseed.substring(4,6));
-	if(tseed.substring(4,6) >= 80)
+	
+	if(town.population > town.devLevel)
 	{
 		taskQueue.push("loadCountryFromCode",town.realCountry,"getRegionInCountry",town.realRegion,"getTownsInList","pickTown","startCiv","checkConnections",town);
+		town.population = Math.floor(town.population/2);
 	}
+	var tseed = town.townseed+"";
+	town.population = town.population + Math.floor((parseInt(tseed[1]) * (parseInt(currentYear)-town.foundedYear)+1)/2); //while this equation does work when picking random years, it would be bette to consider it 1 year at a time.
 }
 
 function findTownsInRegion(town) //assumes that the loaded country is the country to be searched
@@ -285,6 +306,25 @@ function findTownsInRegion(town) //assumes that the loaded country is the countr
 		return false;
 	}
 }
+function getTownColour(town)
+{
+	var red = parseInt(fitRecursively(town.townseed.toString().substring(0,3),255)).toString(16);
+	if(red.toString().length < 2)
+	{
+		red = "0"+red;
+	}
+	var green = parseInt(fitRecursively(town.townseed.toString().substring(3,6),255)).toString(16);
+	if(green.toString().length < 2)
+	{
+		green = "0"+green;
+	}
+	var blue = parseInt(fitRecursively(town.townseed.toString().substring(6,9),255)).toString(16);
+	if(blue.toString().length < 2)
+	{
+		blue = "0"+blue
+	}
+	return "#"+red+green+blue;
+}
 
 
 
@@ -292,4 +332,4 @@ if(typeof(Storage) === undefined)
 {
 	document.getElementById("numberbox").innerHTML = "use a newer browser otherwise no data will be saved!";
 }
-setInterval(proccessQueueItem,1000);
+setInterval(proccessQueueItem,500);
