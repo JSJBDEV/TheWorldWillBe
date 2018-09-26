@@ -85,7 +85,7 @@ var countryId = 0;
 var taskQueue = [];
 var seed = 0;
 var towns = [];
-var currentYear;
+var currentYear = 0;
 
 function getFile(url) //using a simple fetch method I can grab my libraries.
 {
@@ -147,6 +147,7 @@ function getIDforYear(year)
 //due to the asynchronous nature of importing a file there is 2 possible ways of using the data; either I convert my big data set to .js readable files or use a quee based system for loading resources.
 function proccessQueueItem()
 {
+	document.getElementById("year").innerHTML = "Year: "+currentYear;
 	document.getElementById("taskdisplay").innerHTML = taskQueue;
 	switch(taskQueue[0])//REQUIRES = R: OUTPUTS= O:
 	{
@@ -241,6 +242,14 @@ function proccessQueueItem()
 	}
 
 }
+function continueSim()
+{
+	if(taskQueue.length == 0)
+	{
+		currentYear = parseInt(currentYear)+1;
+		genDefaultTasks();
+	}
+}
 function shiftIfSuccess()
 {
 	if(taskResponse !== undefined && countryId !== undefined && loadedRes !== undefined)
@@ -282,6 +291,17 @@ function simYear()
 	currentYear = document.getElementById("numberbox").value
 	genDefaultTasks();
 	
+}
+function playpause()
+{
+	if(taskQueue[0] == "paused")
+	{
+		taskQueue.shift();
+	}
+	else
+	{
+		taskQueue.push("paused");
+	}
 }
 function townIterate(town)
 {
@@ -333,3 +353,4 @@ if(typeof(Storage) === undefined)
 	document.getElementById("numberbox").innerHTML = "use a newer browser otherwise no data will be saved!";
 }
 setInterval(proccessQueueItem,500);
+setInterval(continueSim,1000);
