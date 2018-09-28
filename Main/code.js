@@ -271,7 +271,7 @@ function Town(realCountry,realName,realRegion,latitude,longitude) //magical town
 	this.longitude = longitude;
 	this.townseed = baseGenerator(222+towns.length);
 	this.population = 1;
-	this.devLevel = 10;
+	this.devLevel = 100;
 	this.branchedFrom = "N/A";
 	addMarker(latitude,longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+realName+'"'+"))'>"+realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d=0&c1=5&c2=3&c3=6&o=2&c4=5&s=13&c5=1' alt='svg' width='60' height='40'/>");
 	
@@ -316,7 +316,8 @@ function townIterate(town)
 		town.population = Math.floor(town.population/2);
 	}
 	var tseed = town.townseed+"";
-	town.population = town.population + Math.floor((parseInt(tseed[1]) * (parseInt(currentYear)-town.foundedYear)+1)/2); //while this equation does work when picking random years, it would be bette to consider it 1 year at a time.
+	town.population = town.population + Math.floor((parseInt(tseed[1]) * (parseInt(currentYear)-town.foundedYear)+1)/2); 
+	//while this equation does work when picking random years, it would be better to consider it 1 year at a time.
 }
 
 function findTownsInRegion(town) //assumes that the loaded country is the country to be searched
