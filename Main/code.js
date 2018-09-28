@@ -94,6 +94,7 @@ fetch(ResDomain+url)
     return response.text();
   }).then(function(text) { 
 	loadedRes = text.split("\n");
+	taskQueue.shift();
 	return loadedRes;
 });
 	
@@ -148,13 +149,12 @@ function getIDforYear(year)
 function proccessQueueItem()
 {
 	document.getElementById("year").innerHTML = "Year: "+currentYear;
-	document.getElementById("taskdisplay").innerHTML = taskQueue;
+	//document.getElementById("taskdisplay").innerHTML = taskQueue;
 	switch(taskQueue[0])//REQUIRES = R: OUTPUTS= O:
 	{
 		case "loadCityNumbers": //R:FileUrl O: Numbers File
 			
 			getFile("numberofcities.txt");
-			shiftIfSuccess();
 			break;
 			
 		case "getCountryIdFromYear": // R: Year O: Country ID
@@ -186,15 +186,19 @@ function proccessQueueItem()
 			break;
 		
 		case "loadCountryFromID": //R: Country ID, Numbers File: O: Country file (Resource)
-			
-			var compound = loadedRes[parseInt(countryId)];
-			compound = compound.split(",");
-			getFile("countries/"+compound[0]+".txt");
-			shiftIfSuccess();
+			if(loadedRes !== undefined)
+			{
+				var compound = loadedRes[parseInt(countryId)];
+				compound = compound.split(",");
+				getFile("countries/"+compound[0]+".txt");
+			}
 			break;
 		case "loadCountryFromCode": //R Country Code (next) o: Country File (Resource)
-			taskQueue.shift();
-			getFile("countries/"+taskQueue.shift()+".txt");
+			if(loadedRes !== undefined)
+			{
+				getFile("countries/"+taskQueue[1]+".txt");
+				shiftIfSuccess();
+			}
 			break;
 		
 		case "getRegionInCountry": //R: Country File, Region (next) O: Region in country (Resource)
@@ -240,7 +244,7 @@ function proccessQueueItem()
 			
 		
 	}
-
+	
 }
 function continueSim()
 {
@@ -352,5 +356,5 @@ if(typeof(Storage) === undefined)
 {
 	document.getElementById("numberbox").innerHTML = "use a newer browser otherwise no data will be saved!";
 }
-setInterval(proccessQueueItem,500);
-setInterval(continueSim,1000);
+setInterval(proccessQueueItem,20);
+setInterval(continueSim,400);
