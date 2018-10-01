@@ -149,108 +149,125 @@ function getIDforYear(year)
 function proccessQueueItem()
 {
 	document.getElementById("year").innerHTML = "Year: "+currentYear;
-	//document.getElementById("taskdisplay").innerHTML = taskQueue;
-	switch(taskQueue[0])//REQUIRES = R: OUTPUTS= O:
+	document.getElementById("taskdisplay").innerHTML = taskQueue;
+	if(taskResponse !== undefined)
 	{
-		case "loadCityNumbers": //R:FileUrl O: Numbers File
+		switch(taskQueue[0])//REQUIRES = R: OUTPUTS= O:
+		{
+			case "loadCityNumbers": //R:FileUrl O: Numbers File
+				
+				getFile("numberofcities.txt");
+				break;
+				
+			case "getCountryIdFromYear": // R: Year O: Country ID
+				
+				var year = parseInt(currentYear);
+				getIDforYear(year);
+				lastTown = "none";
+				shiftIfSuccess();
+				break;
+				
+			//----Below this line all tasks take global inputs, such as seed or Country File----//	
 			
-			getFile("numberofcities.txt");
-			break;
-			
-		case "getCountryIdFromYear": // R: Year O: Country ID
-			
-			var year = parseInt(currentYear);
-			getIDforYear(year);
-			lastTown = "none";
-			shiftIfSuccess();
-			break;
-			
-		//----Below this line all tasks take global inputs, such as seed or Country File----//	
-		
-		case "getTownsInCountryFromId": //R: Country ID O: Number of Towns (task)
-			
-			var compound = loadedRes[parseInt(countryId)];
-			compound = compound.split(",");
-			taskResponse = compound[1];
-			console.log(taskResponse);
-			shiftIfSuccess();
-			break;
-			
-		case "getCountryCodeFromId": //R: Country ID O: Country Code (task)
-			
-			var compound = loadedRes[parseInt(countryId)];
-			compound = compound.split(",");
-			taskResponse = compound[0];
-			console.log(taskResponse);
-			shiftIfSuccess();
-			break;
-		
-		case "loadCountryFromID": //R: Country ID, Numbers File: O: Country file (Resource)
-			if(loadedRes !== undefined)
-			{
+			case "getTownsInCountryFromId": //R: Country ID O: Number of Towns (task)
+				
 				var compound = loadedRes[parseInt(countryId)];
 				compound = compound.split(",");
-				getFile("countries/"+compound[0]+".txt");
-			}
-			break;
-		case "loadCountryFromCode": //R Country Code (next) o: Country File (Resource)
-			if(loadedRes !== undefined)
-			{
-				getFile("countries/"+taskQueue[1]+".txt");
+				taskResponse = compound[1];
+				console.log(taskResponse);
 				shiftIfSuccess();
-			}
-			break;
-		
-		case "getRegionInCountry": //R: Country File, Region (next) O: Region in country (Resource)
-			taskQueue.shift();
-			var regionRes = loadedRes.filter(findTownsInRegion);
-			loadedRes = regionRes;
-			shiftIfSuccess();
-			break;
+				break;
+				
+			case "getCountryCodeFromId": //R: Country ID O: Country Code (task)
+				
+				var compound = loadedRes[parseInt(countryId)];
+				compound = compound.split(",");
+				taskResponse = compound[0];
+				console.log(taskResponse);
+				shiftIfSuccess();
+				break;
 			
-		case "getTownsInList": //R: Country/Region File O: Number of Towns
-			taskResponse = loadedRes.length;
-			shiftIfSuccess();
+			case "loadCountryFromID": //R: Country ID, Numbers File: O: Country file (Resource)
+				if(loadedRes !== undefined)
+				{
+					var compound = loadedRes[parseInt(countryId)];
+					compound = compound.split(",");
+					getFile("countries/"+compound[0]+".txt");
+				}
+				break;
+			case "loadCountryFromCode": //R Country Code (next) o: Country File (Resource)
+				if(loadedRes !== undefined)
+				{
+					getFile("countries/"+taskQueue[1]+".txt");
+					shiftIfSuccess();
+				}
+				break;
 			
+			case "getRegionInCountry": //R: Country File, Region (next) O: Region in country (Resource)
+				taskQueue.shift();
+				var regionRes = loadedRes.filter(findTownsInRegion);
+				loadedRes = regionRes;
+				shiftIfSuccess();
+				break;
+				
+			case "getTownsInList": //R: Country/Region File O: Number of Towns
+				taskResponse = loadedRes.length;
+				shiftIfSuccess();
+				break;
+				
+				
+			case "pickTown": //R: Number of Towns (task), seed, Country/Region File,  O: A Town (task)
+				
+				var tseed = ""+seed;
+				tseed = tseed.substring(2,9);
+				var townEquiv = fitRecursively(parseInt(tseed),parseInt(taskResponse)); //Number Of Towns
+				console.log(townEquiv);
+				taskResponse = loadedRes[townEquiv];
+				shiftIfSuccess();
+				break;
 			
-		case "pickTown": //R: Number of Towns (task), seed, Country/Region File,  O: A Town (task)
+			case "startCiv": //R: A Town (task) O: A Civilisation Object (returing the town added) (task)
+				
+				var compound = taskResponse.split(",");
+				if(compound.length > 2)
+				{
+					towns.push(new Town(compound[0],compound[1],compound[3],compound[5],compound[6]));
+					taskResponse = towns[towns.length-1];
+				}
+				
+				shiftIfSuccess();
+				break;
+				
+			case "checkCivs": //UTILITY O: tasks for town expansion
+				towns.forEach(townIterate);
+				taskQueue.shift();
+				break;
+			case "checkConnections": //R: A new town (task from startCiv), The original town (from next) O: draw lines in nations.
+				taskQueue.shift()
+				var oldTown = taskQueue.shift();
+				taskResponse.branchedFrom = oldTown.realName;
+				addPolyline([[taskResponse.latitude,taskResponse.longitude],[oldTown.latitude,oldTown.longitude]],getTownColour(oldTown));
+				break;
+				
 			
-			var tseed = ""+seed;
-			tseed = tseed.substring(2,9);
-			var townEquiv = fitRecursively(parseInt(tseed),parseInt(taskResponse)); //Number Of Towns
-			console.log(townEquiv);
-			taskResponse = loadedRes[townEquiv];
-			shiftIfSuccess();
-			break;
-		
-		case "startCiv": //R: A Town (task) O: A Civilisation Object (returing the town added) (task)
-			
-			var compound = taskResponse.split(",");
-			towns.push(new Town(compound[0],compound[1],compound[3],compound[5],compound[6]));
-			taskResponse = towns[towns.length-1];
-			
-			shiftIfSuccess();
-			break;
-		case "checkCivs": //UTILITY O: tasks for town expansion
-			towns.forEach(townIterate);
-			taskQueue.shift();
-			break;
-		case "checkConnections": //R: A new town (task from startCiv), The original town (from next) O: draw lines in nations.
-			taskQueue.shift()
-			var oldTown = taskQueue.shift();
-			taskResponse.branchedFrom = oldTown.realName;
-			addPolyline([[taskResponse.latitude,taskResponse.longitude],[oldTown.latitude,oldTown.longitude]],getTownColour(oldTown));
-			
-			
-		
+		}
 	}
-	
+	continueSim();
 }
 function continueSim()
 {
+	console.log("triggered");
 	if(taskQueue.length == 0)
 	{
 		currentYear = parseInt(currentYear)+1;
+		genDefaultTasks();
+	}
+	if(taskQueue[0] == "startCiv" && taskResponse.split(",").length < 2)
+	{
+		taskQueue.unshift("v");
+	}
+	if(taskResponse === undefined)
+	{
 		genDefaultTasks();
 	}
 }
@@ -282,7 +299,7 @@ function getTownByRealName(name)
 }
 function generateTownPage(town)
 {
-	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion+"<br> Population: "+town.population+"<br> Branched From: "+town.branchedFrom;
+	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion+"<br> Population: "+town.population+"<br>Dev Level:"+town.devLevel+"<br> Branched From: "+town.branchedFrom;
 }
 //----------------------------------------------//
 function genDefaultTasks()
@@ -316,7 +333,9 @@ function townIterate(town)
 		town.population = Math.floor(town.population/2);
 	}
 	var tseed = town.townseed+"";
+	var yseed = ""+seed;
 	town.population = town.population + Math.floor((parseInt(tseed[1]) * (parseInt(currentYear)-town.foundedYear)+1)/2); 
+	town.devLevel = town.devLevel + (parseInt(yseed.substring(2,4))+Math.floor(0.1*(parseInt(tseed.substring(1,3))))); 
 	//while this equation does work when picking random years, it would be better to consider it 1 year at a time.
 }
 
@@ -357,5 +376,4 @@ if(typeof(Storage) === undefined)
 {
 	document.getElementById("numberbox").innerHTML = "use a newer browser otherwise no data will be saved!";
 }
-setInterval(proccessQueueItem,20);
-setInterval(continueSim,400);
+setInterval(proccessQueueItem,100);
