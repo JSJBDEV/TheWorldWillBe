@@ -2,15 +2,19 @@ var markers = [];
 var polygons = [];
 var polylines = [];
 var map = L.map('map', {
-	minZoom: 2,
-	maxZoom: 9,
+	minZoom: 1,
+	maxZoom: 16,
 	renderer: L.svg()  
 });
 
 var cartodbAttribution = '&copy; <a href="https://earthobservatory.nasa.gov/">NASA</a>';
 
-var positron = L.tileLayer('http://s3.amazonaws.com/com.modestmaps.bluemarble/{z}-r{y}-c{x}.jpg', {
-	attribution: cartodbAttribution
+var Stamen_Watercolor = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}', {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+	subdomains: 'abcd',
+	minZoom: 1,
+	maxZoom: 16,
+	ext: 'jpg'
 }).addTo(map);
 
 var myIcon = L.icon({
@@ -247,6 +251,10 @@ function proccessQueueItem()
 				var oldTown = taskQueue.shift();
 				taskResponse.branchedFrom = oldTown.realName;
 				addPolyline([[taskResponse.latitude,taskResponse.longitude],[oldTown.latitude,oldTown.longitude]],getTownColour(oldTown));
+				removeMarker(markers.length-1);
+				var flagArray = [fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(0,2)),11),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(1,9)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(7,3)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(2,4)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(3,5)),11),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(4,6)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(5,7)),17),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(6,8)),7)];
+				addMarker(taskResponse.latitude,taskResponse.longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+taskResponse.realName+'"'+"))'>"+taskResponse.realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
+				taskResponse.partOf = oldTown.partOf;
 				break;
 				
 			
@@ -283,23 +291,27 @@ function Town(realCountry,realName,realRegion,latitude,longitude) //magical town
 {	this.foundedYear = currentYear;
 	this.realCountry = realCountry;
 	this.realRegion = realRegion;
-	this.realName = realName;
+	this.realName = realName.replace(/"|'/gi,"`");
 	this.latitude = latitude;
 	this.longitude = longitude;
-	this.townseed = baseGenerator(222+towns.length);
+	this.townseed = ""+baseGenerator(222+towns.length);
 	this.population = 1;
 	this.devLevel = 100;
+	this.happiness = 100;
 	this.branchedFrom = "N/A";
-	addMarker(latitude,longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+realName+'"'+"))'>"+realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d=0&c1=5&c2=3&c3=6&o=2&c4=5&s=13&c5=1' alt='svg' width='60' height='40'/>");
+	this.partOf = this.realName;
+	var flagArray = [fitRecursively(parseInt(this.townseed.substring(0,2)),11),fitRecursively(parseInt(this.townseed.substring(1,9)),7),fitRecursively(parseInt(this.townseed.substring(7,3)),7),fitRecursively(parseInt(this.townseed.substring(2,4)),7),fitRecursively(parseInt(this.townseed.substring(3,5)),11),fitRecursively(parseInt(this.townseed.substring(4,6)),7),fitRecursively(parseInt(this.townseed.substring(5,7)),17),fitRecursively(parseInt(this.townseed.substring(6,8)),7)];
+	addMarker(latitude,longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+realName+'"'+"))'>"+realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
 	
 }
+
 function getTownByRealName(name)
 {
 	return towns.find(x => x.realName === name);
 }
 function generateTownPage(town)
 {
-	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion+"<br> Population: "+town.population+"<br>Dev Level:"+town.devLevel+"<br> Branched From: "+town.branchedFrom;
+	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion+"<br> Population: "+town.population+"<br>Dev Level:"+town.devLevel+"<br> Branched From: "+town.branchedFrom+"<br> Part of: "+town.partOf+" Republic";
 }
 //----------------------------------------------//
 function genDefaultTasks()
@@ -336,6 +348,18 @@ function townIterate(town)
 	var yseed = ""+seed;
 	town.population = town.population + Math.floor((parseInt(tseed[1]) * (parseInt(currentYear)-town.foundedYear)+1)/2); 
 	town.devLevel = town.devLevel + (parseInt(yseed.substring(2,4))+Math.floor(0.1*(parseInt(tseed.substring(1,3))))); 
+	if(parseInt(yseed.substring(3,7)) >= 50)
+	{
+		town.happiness = town.happiness+1;
+	}
+	else
+	{
+		town.happiness = town.happiness-1;
+	}
+	if(happiness < 20)
+	{
+		//start a revolution
+	}
 	//while this equation does work when picking random years, it would be better to consider it 1 year at a time.
 }
 
