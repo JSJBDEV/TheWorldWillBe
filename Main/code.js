@@ -311,7 +311,7 @@ function getTownByRealName(name)
 }
 function generateTownPage(town)
 {
-	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion+"<br> Population: "+town.population+"<br>Dev Level:"+town.devLevel+"<br> Branched From: "+town.branchedFrom+"<br> Part of: "+town.partOf+" Republic";
+	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion+"<br> Population: "+town.population+"<br>Dev Level:"+town.devLevel+"<br> Branched From: "+town.branchedFrom+"<br> Part of: "+town.partOf+" Republic <br> Happiness: "+town.happiness;
 }
 //----------------------------------------------//
 function genDefaultTasks()
@@ -346,9 +346,10 @@ function townIterate(town)
 	}
 	var tseed = town.townseed+"";
 	var yseed = ""+seed;
+	var ratioseed = ""+(town.townseed % seed);
 	town.population = town.population + Math.floor((parseInt(tseed[1]) * (parseInt(currentYear)-town.foundedYear)+1)/2); 
 	town.devLevel = town.devLevel + (parseInt(yseed.substring(2,4))+Math.floor(0.1*(parseInt(tseed.substring(1,3))))); 
-	if(parseInt(yseed.substring(3,7)) >= 50)
+	if(parseInt(ratioseed.substring(3,5)) >= 50)
 	{
 		town.happiness = town.happiness+1;
 	}
@@ -356,7 +357,7 @@ function townIterate(town)
 	{
 		town.happiness = town.happiness-1;
 	}
-	if(happiness < 20)
+	if(town.happiness < 20)
 	{
 		//start a revolution
 	}
@@ -373,6 +374,12 @@ function findTownsInRegion(town) //assumes that the loaded country is the countr
 	{
 		return false;
 	}
+	
+}
+function sortHappiness() //returns the array of towns but sorted with the happiest first. (with help from w3schools)
+{
+		happinessarray = towns.sort(function(a,b){return b.happiness - a.happiness})
+		return happinessarray
 }
 function getTownColour(town)
 {
