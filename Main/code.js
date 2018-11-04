@@ -70,9 +70,9 @@ function removePolygon(id)
 	polygons.splice(id);
 }
 
-function addMarker(lat,lon,desc)
+function addMarker(iconIn,lat,lon,desc)
 {
-	var marker = L.marker([lat,lon],{icon: mainTownIcon}).addTo(map).bindPopup(desc);
+	var marker = L.marker([lat,lon],{icon: iconIn}).addTo(map).bindPopup(desc);
 	markers.push(marker);
 	return markers;
 }
@@ -136,7 +136,7 @@ function getIDforYear(year)
 {
 	
 	var tseed = ""+baseGenerator(year);
-	console.log(tseed);
+	//console.log(tseed);
 	if(parseInt(tseed.substring(0,2))> 70)
 	{
 		countryId = fitRecursively(parseInt(tseed.substring(1,4)),235);
@@ -178,7 +178,7 @@ function proccessQueueItem()
 				var compound = loadedRes[parseInt(countryId)];
 				compound = compound.split(",");
 				taskResponse = compound[1];
-				console.log(taskResponse);
+				//console.log(taskResponse);
 				shiftIfSuccess();
 				break;
 				
@@ -187,7 +187,7 @@ function proccessQueueItem()
 				var compound = loadedRes[parseInt(countryId)];
 				compound = compound.split(",");
 				taskResponse = compound[0];
-				console.log(taskResponse);
+				//console.log(taskResponse);
 				shiftIfSuccess();
 				break;
 			
@@ -225,7 +225,7 @@ function proccessQueueItem()
 				var tseed = ""+seed;
 				tseed = tseed.substring(2,9);
 				var townEquiv = fitRecursively(parseInt(tseed),parseInt(taskResponse)); //Number Of Towns
-				console.log(townEquiv);
+				//console.log(townEquiv);
 				taskResponse = loadedRes[townEquiv];
 				shiftIfSuccess();
 				break;
@@ -253,7 +253,7 @@ function proccessQueueItem()
 				addPolyline([[taskResponse.latitude,taskResponse.longitude],[oldTown.latitude,oldTown.longitude]],getTownColour(oldTown));
 				removeMarker(markers.length-1);
 				var flagArray = [fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(0,2)),11),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(1,9)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(7,3)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(2,4)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(3,5)),11),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(4,6)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(5,7)),17),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(6,8)),7)];
-				addMarker(taskResponse.latitude,taskResponse.longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+taskResponse.realName+'"'+"))'>"+taskResponse.realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
+				addMarker(subTownIcon,taskResponse.latitude,taskResponse.longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+taskResponse.realName+'"'+"))'>"+taskResponse.realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
 				taskResponse.partOf = oldTown.partOf;
 				break;
 				
@@ -264,7 +264,7 @@ function proccessQueueItem()
 }
 function continueSim()
 {
-	console.log("triggered");
+	//console.log("triggered");
 	if(taskQueue.length == 0)
 	{
 		currentYear = parseInt(currentYear)+1;
@@ -298,10 +298,11 @@ function Town(realCountry,realName,realRegion,latitude,longitude) //magical town
 	this.population = 1;
 	this.devLevel = 100;
 	this.happiness = 100;
+	this.resources = this.townseed.substring(4,6);
 	this.branchedFrom = "N/A";
 	this.partOf = this.realName;
 	var flagArray = [fitRecursively(parseInt(this.townseed.substring(0,2)),11),fitRecursively(parseInt(this.townseed.substring(1,9)),7),fitRecursively(parseInt(this.townseed.substring(7,3)),7),fitRecursively(parseInt(this.townseed.substring(2,4)),7),fitRecursively(parseInt(this.townseed.substring(3,5)),11),fitRecursively(parseInt(this.townseed.substring(4,6)),7),fitRecursively(parseInt(this.townseed.substring(5,7)),17),fitRecursively(parseInt(this.townseed.substring(6,8)),7)];
-	addMarker(latitude,longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+realName+'"'+"))'>"+realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
+	addMarker(mainTownIcon,latitude,longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+realName+'"'+"))'>"+realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
 	
 }
 
@@ -380,6 +381,10 @@ function sortHappiness() //returns the array of towns but sorted with the happie
 {
 		happinessarray = towns.sort(function(a,b){return b.happiness - a.happiness})
 		return happinessarray
+}
+function findAllTownsInNation(origin)
+{
+	
 }
 function getTownColour(town)
 {
