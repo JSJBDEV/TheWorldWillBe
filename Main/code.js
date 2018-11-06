@@ -255,6 +255,8 @@ function proccessQueueItem()
 				var flagArray = [fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(0,2)),11),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(1,9)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(7,3)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(2,4)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(3,5)),11),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(4,6)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(5,7)),17),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(6,8)),7)];
 				addMarker(subTownIcon,taskResponse.latitude,taskResponse.longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+taskResponse.realName+'"'+"))'>"+taskResponse.realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
 				taskResponse.partOf = oldTown.partOf;
+				oldTown.resources = oldTown.resources+taskResponse.resources;
+				
 				break;
 				
 			
@@ -277,6 +279,11 @@ function continueSim()
 	if(taskResponse === undefined)
 	{
 		genDefaultTasks();
+		setTimeout(proccessQueueItem,1000);
+	}
+	else
+	{
+		setTimeout(proccessQueueItem,100);
 	}
 }
 function shiftIfSuccess()
@@ -298,7 +305,7 @@ function Town(realCountry,realName,realRegion,latitude,longitude) //magical town
 	this.population = 1;
 	this.devLevel = 100;
 	this.happiness = 100;
-	this.resources = this.townseed.substring(4,6);
+	this.resources = parseInt(this.townseed.substring(4,6));
 	this.branchedFrom = "N/A";
 	this.partOf = this.realName;
 	var flagArray = [fitRecursively(parseInt(this.townseed.substring(0,2)),11),fitRecursively(parseInt(this.townseed.substring(1,9)),7),fitRecursively(parseInt(this.townseed.substring(7,3)),7),fitRecursively(parseInt(this.townseed.substring(2,4)),7),fitRecursively(parseInt(this.townseed.substring(3,5)),11),fitRecursively(parseInt(this.townseed.substring(4,6)),7),fitRecursively(parseInt(this.townseed.substring(5,7)),17),fitRecursively(parseInt(this.townseed.substring(6,8)),7)];
@@ -312,7 +319,7 @@ function getTownByRealName(name)
 }
 function generateTownPage(town)
 {
-	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion+"<br> Population: "+town.population+"<br>Dev Level:"+town.devLevel+"<br> Branched From: "+town.branchedFrom+"<br> Part of: "+town.partOf+" Republic <br> Happiness: "+town.happiness;
+	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion+"<br> Population: "+town.population+"<br>Dev Level:"+town.devLevel+"<br> Branched From: "+town.branchedFrom+"<br> Part of: "+town.partOf+" Republic <br> Happiness: "+town.happiness+"<br> Resources: "+town.resources;
 }
 //----------------------------------------------//
 function genDefaultTasks()
@@ -358,11 +365,24 @@ function townIterate(town)
 	{
 		town.happiness = town.happiness-1;
 	}
+	if(town.devLevel < (getTownByRealName(town.partOf).devLevel/2))
+	{
+		getTownByRealName(town.partOf).resources = getTownByRealName(town.partOf).resources-1;
+	}
+	if(getTownByRealName(town.partOf).resources < 0)
+	{
+		console.log(getTownByRealName(town.partOf)+" has fallen");
+		
+	}
 	if(town.happiness < 20)
 	{
 		//start a revolution
 	}
-	//while this equation does work when picking random years, it would be better to consider it 1 year at a time.
+	
+}
+function removeNation(origin)
+{
+	towns = towns.filter(x => !findAllTownsInNation(origin).includes(x))
 }
 
 function findTownsInRegion(town) //assumes that the loaded country is the country to be searched
@@ -383,8 +403,8 @@ function sortHappiness() //returns the array of towns but sorted with the happie
 		return happinessarray
 }
 function findAllTownsInNation(origin)
-{
-	
+{ 
+	return towns.filter(x => x.partOf === origin);
 }
 function getTownColour(town)
 {
@@ -405,11 +425,30 @@ function getTownColour(town)
 	}
 	return "#"+red+green+blue;
 }
+function radians(degrees)
+{
+	return degrees * (Math.PI/180);
+}
+function getTownDistance(town1,town2)
+{
+	var R = 6371e3; // this is the haversine formula for converting a set of coordinates to distance. it is freely available from https://www.movable-type.co.uk/scripts/latlong.html I have made it work (using radians() and integrating towns)
+	var φ1 = radians(town1.latitude);
+	var φ2 = radians(town2.latitude);
+	var Δφ = radians(town2.latitude-town1.latitude);
+	var Δλ = radians(town2.longitude-town1.longitude);
 
+	var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+			Math.cos(φ1) * Math.cos(φ2) *
+			Math.sin(Δλ/2) * Math.sin(Δλ/2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+	var d = R * c;
+	return d;
+}
 
 
 if(typeof(Storage) === undefined)
 {
 	document.getElementById("numberbox").innerHTML = "use a newer browser otherwise no data will be saved!";
 }
-setInterval(proccessQueueItem,100);
+setTimeout(proccessQueueItem,100);
