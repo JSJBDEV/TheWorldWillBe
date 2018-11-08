@@ -53,9 +53,9 @@ function addPolygon(latlngs,colour)
 	return polygon;
 	
 }
-function addPolyline(latlngs,colour)
+function addPolyline(townF,latlngs,colour)
 {
-	var polyline = L.polyline(latlngs, {color: colour}).addTo(map);
+	var polyline = L.polyline(latlngs, {color: colour, townFrom: townF}).addTo(map);
 	polylines.push(polyline)
 	
 }
@@ -70,9 +70,9 @@ function removePolygon(id)
 	polygons.splice(id);
 }
 
-function addMarker(iconIn,lat,lon,desc)
+function addMarker(name,iconIn,lat,lon,desc)
 {
-	var marker = L.marker([lat,lon],{icon: iconIn}).addTo(map).bindPopup(desc);
+	var marker = L.marker([lat,lon],{icon: iconIn, title:name}).addTo(map).bindPopup(desc);
 	markers.push(marker);
 	return markers;
 }
@@ -159,7 +159,12 @@ function proccessQueueItem()
 		switch(taskQueue[0])//REQUIRES = R: OUTPUTS= O:
 		{
 			case "loadCityNumbers": //R:FileUrl O: Numbers File
-				
+				towns.forEach(function(town){
+					if(town.removable == true)
+					{
+						removeNation(town.partOf);
+					}
+						});
 				getFile("numberofcities.txt");
 				break;
 				
@@ -250,10 +255,10 @@ function proccessQueueItem()
 				taskQueue.shift()
 				var oldTown = taskQueue.shift();
 				taskResponse.branchedFrom = oldTown.realName;
-				addPolyline([[taskResponse.latitude,taskResponse.longitude],[oldTown.latitude,oldTown.longitude]],getTownColour(oldTown));
+				addPolyline(oldTown.realName,[[taskResponse.latitude,taskResponse.longitude],[oldTown.latitude,oldTown.longitude]],getTownColour(oldTown));
 				removeMarker(markers.length-1);
 				var flagArray = [fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(0,2)),11),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(1,9)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(7,3)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(2,4)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(3,5)),11),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(4,6)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(5,7)),17),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(6,8)),7)];
-				addMarker(subTownIcon,taskResponse.latitude,taskResponse.longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+taskResponse.realName+'"'+"))'>"+taskResponse.realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
+				addMarker(taskResponse.realName,subTownIcon,taskResponse.latitude,taskResponse.longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+taskResponse.realName+'"'+"))'>"+taskResponse.realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
 				taskResponse.partOf = oldTown.partOf;
 				oldTown.resources = oldTown.resources+taskResponse.resources;
 				
@@ -309,7 +314,7 @@ function Town(realCountry,realName,realRegion,latitude,longitude) //magical town
 	this.branchedFrom = "N/A";
 	this.partOf = this.realName;
 	var flagArray = [fitRecursively(parseInt(this.townseed.substring(0,2)),11),fitRecursively(parseInt(this.townseed.substring(1,9)),7),fitRecursively(parseInt(this.townseed.substring(7,3)),7),fitRecursively(parseInt(this.townseed.substring(2,4)),7),fitRecursively(parseInt(this.townseed.substring(3,5)),11),fitRecursively(parseInt(this.townseed.substring(4,6)),7),fitRecursively(parseInt(this.townseed.substring(5,7)),17),fitRecursively(parseInt(this.townseed.substring(6,8)),7)];
-	addMarker(mainTownIcon,latitude,longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+realName+'"'+"))'>"+realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
+	addMarker(this.realName,mainTownIcon,latitude,longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+realName+'"'+"))'>"+realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
 	
 }
 
@@ -371,8 +376,8 @@ function townIterate(town)
 	}
 	if(getTownByRealName(town.partOf).resources < 0)
 	{
-		console.log(getTownByRealName(town.partOf)+" has fallen");
-		
+		console.log(town.partOf+" has fallen");
+		town.removable = true;
 	}
 	if(town.happiness < 20)
 	{
@@ -381,8 +386,21 @@ function townIterate(town)
 	
 }
 function removeNation(origin)
-{
-	towns = towns.filter(x => !findAllTownsInNation(origin).includes(x))
+{	
+	markers.forEach(function(town){
+		if(findAllTownsInNation(origin).includes(getTownByRealName(town.options.title)))
+		{
+			map.removeLayer(town);
+		}
+	});
+	polylines.forEach(function(path){
+		if(findAllTownsInNation(origin).includes(getTownByRealName(path.options.townFrom)))
+		{
+			map.removeLayer(path);
+		}
+	});
+	towns = towns.filter(x => !findAllTownsInNation(origin).includes(x));
+	
 }
 
 function findTownsInRegion(town) //assumes that the loaded country is the country to be searched
@@ -401,6 +419,11 @@ function sortHappiness() //returns the array of towns but sorted with the happie
 {
 		happinessarray = towns.sort(function(a,b){return b.happiness - a.happiness})
 		return happinessarray
+}
+function sortResources() //returns the array of towns but sorted with the happiest first. (with help from w3schools)
+{
+		resourcesarray = towns.sort(function(a,b){return b.resources - a.resources})
+		return resourcesarray
 }
 function findAllTownsInNation(origin)
 { 
