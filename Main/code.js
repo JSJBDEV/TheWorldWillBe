@@ -282,7 +282,6 @@ function proccessQueueItem()
 						potentialTowns.push(townIns);
 					}
 				});
-				console.log(potentialTowns);
 				taskResponse = potentialTowns[fitRecursively(parseInt(aTown.townseed.substring(5,7)),potentialTowns.length-1)];
 				break;
 			
@@ -332,6 +331,7 @@ function Town(realCountry,realName,realRegion,latitude,longitude) //magical town
 	this.devLevel = 100;
 	this.happiness = 100;
 	this.resources = parseInt(this.townseed.substring(4,6));
+	this.foodMod = 5;
 	this.branchedFrom = "N/A";
 	this.partOf = this.realName;
 	var flagArray = [fitRecursively(parseInt(this.townseed.substring(0,2)),11),fitRecursively(parseInt(this.townseed.substring(1,9)),7),fitRecursively(parseInt(this.townseed.substring(7,3)),7),fitRecursively(parseInt(this.townseed.substring(2,4)),7),fitRecursively(parseInt(this.townseed.substring(3,5)),11),fitRecursively(parseInt(this.townseed.substring(4,6)),7),fitRecursively(parseInt(this.townseed.substring(5,7)),17),fitRecursively(parseInt(this.townseed.substring(6,8)),7)];
@@ -345,7 +345,7 @@ function getTownByRealName(name)
 }
 function generateTownPage(town)
 {
-	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion+"<br> Population: "+town.population+"<br>Dev Level:"+town.devLevel+"<br> Branched From: "+town.branchedFrom+"<br> Part of: "+town.partOf+" Republic <br> Happiness: "+town.happiness+"<br> Resources: "+town.resources;
+	document.getElementById("maindisplay").innerHTML = "Town Name: "+town.realName+"<br>(IRL Country): "+town.realCountry+"<br>Year First Founded:"+town.foundedYear+"<br>(IRL Region): "+town.realRegion+"<br> Population: "+town.population+"<br>Dev Level:"+town.devLevel+"<br> Branched From: "+town.branchedFrom+"<br> Part of: "+town.partOf+" Republic <br> Happiness: "+town.happiness+"<br> Resources: "+town.resources+"<br>  Food Modifier: "+town.foodMod;
 }
 //----------------------------------------------//
 function genDefaultTasks()
@@ -375,6 +375,23 @@ function townIterate(town)
 	var tseed = town.townseed+"";
 	var yseed = ""+seed;
 	var ratioseed = ""+(parseInt(town.townseed) % seed);
+	town.foodMod = parseInt(ratioseed.substring(1,2))+1;
+	if(town.foodMod == 2 || town.foodMod == 3)
+	{
+		getTownByRealName(town.partOf).resources = getTownByRealName(town.partOf).resources-1;
+	}
+	if(town.foodMod == 1)
+	{
+		getTownByRealName(town.partOf).resources = getTownByRealName(town.partOf).resources-2;
+	}
+	if(town.foodMod == 8 || town.foodMod == 9)
+	{
+		getTownByRealName(town.partOf).resources = getTownByRealName(town.partOf).resources+1;
+	}
+	if(town.foodMod == 10)
+	{
+		getTownByRealName(town.partOf).resources = getTownByRealName(town.partOf).resources+2;
+	}
 	if(town.population > town.devLevel)
 	{
 		if(parseInt(ratioseed.substring(2,4)) > 20 && town.devLevel > 5000)
@@ -411,6 +428,11 @@ function townIterate(town)
 	{
 		//start a revolution
 	}
+	
+	
+}
+function generateEvents()
+{
 	
 }
 function removeNation(origin)
