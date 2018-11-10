@@ -46,6 +46,7 @@ map.setView([0, 0], 0);
 var latlngs = [[37, -109.05],[41, -109.03],[41, -102.05],[37, -102.04]];
 var polygon = L.polygon(latlngs, {color: 'red'}).addTo(map);
 
+//funcions by me//
 function addPolygon(latlngs,colour)
 {
 	var polygon = L.polygon(latlngs, {color: colour}).addTo(map);
@@ -81,6 +82,7 @@ function removeMarker(id)
 	map.removeLayer(markers[id]);
 	markers.splice(id);
 }
+
 //--------------------------------------non map things------------------------//
 var ResDomain = "http://jsjbdev.github.io/world/"
 var loadedRes = [];
@@ -240,6 +242,7 @@ function proccessQueueItem()
 				var compound = taskResponse.split(",");
 				if(compound.length > 2)
 				{
+					
 					towns.push(new Town(compound[0],compound[1],compound[3],compound[5],compound[6]));
 					taskResponse = towns[towns.length-1];
 				}
@@ -256,13 +259,14 @@ function proccessQueueItem()
 				var oldTown = taskQueue.shift();
 				taskResponse.branchedFrom = oldTown.realName;
 				addPolyline(oldTown.realName,[[taskResponse.latitude,taskResponse.longitude],[oldTown.latitude,oldTown.longitude]],getTownColour(oldTown));
+				
 				removeMarker(markers.length-1);
 				var flagArray = [fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(0,2)),11),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(1,9)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(7,3)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(2,4)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(3,5)),11),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(4,6)),7),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(5,7)),17),fitRecursively(parseInt(getTownByRealName(oldTown.partOf).townseed.substring(6,8)),7)];
 				addMarker(taskResponse.realName,subTownIcon,taskResponse.latitude,taskResponse.longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+taskResponse.realName+'"'+"))'>"+taskResponse.realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
+				
 				taskResponse.partOf = oldTown.partOf;
 				oldTown.resources = oldTown.resources+taskResponse.resources;
 				
-				break;
 				
 			
 		}
@@ -351,15 +355,19 @@ function playpause()
 }
 function townIterate(town)
 {
-	
-	if(town.population > town.devLevel)
-	{
-		taskQueue.push("loadCountryFromCode",town.realCountry,"getRegionInCountry",town.realRegion,"getTownsInList","pickTown","startCiv","checkConnections",town);
-		town.population = Math.floor(town.population/2);
-	}
 	var tseed = town.townseed+"";
 	var yseed = ""+seed;
 	var ratioseed = ""+(town.townseed % seed);
+	if(town.population > town.devLevel)
+	{
+		if(parseInt(ratioseed[2,4]) > 70 && town.devLevel > 5000)
+		{
+			
+		}
+		taskQueue.push("loadCountryFromCode",town.realCountry,"getRegionInCountry",town.realRegion,"getTownsInList","pickTown","startCiv","checkConnections",town);
+		town.population = Math.floor(town.population/2);
+	}
+	
 	town.population = town.population + Math.floor((parseInt(tseed[1]) * (parseInt(currentYear)-town.foundedYear)+1)/2); 
 	town.devLevel = town.devLevel + (parseInt(yseed.substring(2,4))+Math.floor(0.1*(parseInt(tseed.substring(1,3))))); 
 	if(parseInt(ratioseed.substring(3,5)) >= 50)
@@ -447,6 +455,10 @@ function getTownColour(town)
 		blue = "0"+blue
 	}
 	return "#"+red+green+blue;
+}
+function getArrayOfNearbyCities(townFrom)
+{
+	return towns.filter(x => getTownDistance(townFrom,x)< townFrom.devLevel*townFrom.resources);
 }
 function radians(degrees)
 {
