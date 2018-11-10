@@ -266,8 +266,25 @@ function proccessQueueItem()
 				
 				taskResponse.partOf = oldTown.partOf;
 				oldTown.resources = oldTown.resources+taskResponse.resources;
-				
-				
+				break;
+			case "getNearbyTowns": //O: Retrieves compareable list.
+				getFile("compare.txt");
+				break;
+			case "getAnotherRegion": //R: compare.txt and town (next) O: a town instance
+				taskQueue.shift();
+				var aTown = taskQueue.shift();
+				var potentialTowns = [];
+				loadedRes.forEach(function(townIns)
+				{
+					var splitTown = townIns.split(",");
+					if(getLLDistance(splitTown[5],splitTown[6],aTown.latitude,aTown.longitude) < aTown.devLevel*aTown.resources)
+					{
+						potentialTowns.push(townIns);
+					}
+				});
+				console.log(potentialTowns);
+				taskResponse = potentialTowns[fitRecursively(parseInt(aTown.townseed.substring(5,7)),potentialTowns.length-1)];
+				break;
 			
 		}
 	}
@@ -357,14 +374,17 @@ function townIterate(town)
 {
 	var tseed = town.townseed+"";
 	var yseed = ""+seed;
-	var ratioseed = ""+(town.townseed % seed);
+	var ratioseed = ""+(parseInt(town.townseed) % seed);
 	if(town.population > town.devLevel)
 	{
-		if(parseInt(ratioseed[2,4]) > 70 && town.devLevel > 5000)
+		if(parseInt(ratioseed.substring(2,4)) > 20 && town.devLevel > 5000)
 		{
-			
+			taskQueue.push("getNearbyTowns","getAnotherRegion",town,"startCiv","checkConnections",town);
 		}
-		taskQueue.push("loadCountryFromCode",town.realCountry,"getRegionInCountry",town.realRegion,"getTownsInList","pickTown","startCiv","checkConnections",town);
+		else
+		{
+			taskQueue.push("loadCountryFromCode",town.realCountry,"getRegionInCountry",town.realRegion,"getTownsInList","pickTown","startCiv","checkConnections",town);
+		}
 		town.population = Math.floor(town.population/2);
 	}
 	
@@ -471,6 +491,22 @@ function getTownDistance(town1,town2)
 	var φ2 = radians(town2.latitude);
 	var Δφ = radians(town2.latitude-town1.latitude);
 	var Δλ = radians(town2.longitude-town1.longitude);
+
+	var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+			Math.cos(φ1) * Math.cos(φ2) *
+			Math.sin(Δλ/2) * Math.sin(Δλ/2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+	var d = R * c;
+	return d;
+}
+function getLLDistance(lat1,long1,lat2,long2)
+{
+	var R = 6371e3; 
+	var φ1 = radians(lat1);
+	var φ2 = radians(lat2);
+	var Δφ = radians(lat2-lat1);
+	var Δλ = radians(long2-long1);
 
 	var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
 			Math.cos(φ1) * Math.cos(φ2) *
