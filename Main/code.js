@@ -296,6 +296,7 @@ function continueSim()
 	{
 		currentYear = parseInt(currentYear)+1;
 		genDefaultTasks();
+		localStorage.townStore = makeJSON();
 	}
 	if(taskQueue[0] == "startCiv" && taskResponse.split(",").length < 2)
 	{
@@ -585,30 +586,38 @@ function getLLDistance(lat1,long1,lat2,long2)
 }
 function makeJSON()
 {
+	if(towns.length > 0)
+	{
+		towns[0].cyear = currentYear;
+	}
 	return JSON.stringify(towns);
 }
 function reparseTowns(jsonTowns)
 {
 	towns = JSON.parse(jsonTowns);
+	currentYear = towns[0].cyear;
 	markers.forEach(function(marker){removeMarker(markers.indexOf(marker))});
 	polylines.forEach(function(polyline){removePolyline(polylines.indexOf(polyline))});
 	towns.forEach(function(town)
 	{
 		var flagArray = [fitRecursively(parseInt(town.townseed.substring(0,2)),11),fitRecursively(parseInt(town.townseed.substring(1,9)),7),fitRecursively(parseInt(town.townseed.substring(7,3)),7),fitRecursively(parseInt(town.townseed.substring(2,4)),7),fitRecursively(parseInt(town.townseed.substring(3,5)),11),fitRecursively(parseInt(town.townseed.substring(4,6)),7),fitRecursively(parseInt(town.townseed.substring(5,7)),17),fitRecursively(parseInt(town.townseed.substring(6,8)),7)];
 		var usedIcon = mainTownIcon;
-		if(town.branchedFrom !== "N/A")
+		if(town.branchedFrom != "N/A")
 		{
 			usedIcon = subTownIcon;
 			addPolyline(town.branchedFrom,[[town.latitude,town.longitude],[getTownByRealName(town.branchedFrom).latitude,getTownByRealName(town.branchedFrom).longitude]],getTownColour(getTownByRealName(town.branchedFrom)));
 		}
-		addMarker(town.realName,mainTownIcon,town.latitude,town.longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+town.realName+'"'+"))'>"+town.realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
+		addMarker(town.realName,usedIcon,town.latitude,town.longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+town.realName+'"'+"))'>"+town.realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
 		
 	});
 }
-
+function restoreSession()
+{
+	reparseTowns(localStorage.townStore);
+}
 
 if(typeof(Storage) === undefined)
 {
 	document.getElementById("numberbox").innerHTML = "use a newer browser otherwise no data will be saved!";
 }
-setTimeout(proccessQueueItem,100);
+//setTimeout(proccessQueueItem,100);
