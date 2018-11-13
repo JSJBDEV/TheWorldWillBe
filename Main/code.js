@@ -431,6 +431,51 @@ function townIterate(town)
 	
 	
 }
+function battle(side1,side2,iterableSeed)
+{
+	var x = iterableSeed
+	const a = 348563563
+	const b = 126431247
+	const m = 935623331
+	while(side1.length>0)
+	{
+			x = (((x+a)*b)%m)
+			member = side1[0];
+			opposition = side2[0];
+			if(parseInt(x.toString().substring(1,2))>parseInt(x.toString().substring(3,4)))
+			{
+				var newHP = opposition-member;
+				console.log("side1 wins");
+				side2.shift();
+				if(newHP>0)
+				{
+					side2.push(newHP);
+				}
+			}
+			else
+			{
+				var newHP = member-opposition;
+				console.log("side2 wins");
+				side1.shift();
+				if(newHP>0)
+				{
+					side1.push(newHP);
+				}
+			}
+			if(side2.length == 0)
+			{
+				console.log("side1 won the battle");
+				return side1;
+			}
+			
+			
+	}
+	console.log("side 2 won the battle");
+	return side2;
+}
+{
+	
+}
 function generateEvents()
 {
 	
@@ -537,6 +582,28 @@ function getLLDistance(lat1,long1,lat2,long2)
 
 	var d = R * c;
 	return d;
+}
+function makeJSON()
+{
+	return JSON.stringify(towns);
+}
+function reparseTowns(jsonTowns)
+{
+	towns = JSON.parse(jsonTowns);
+	markers.forEach(function(marker){removeMarker(markers.indexOf(marker))});
+	polylines.forEach(function(polyline){removePolyline(polylines.indexOf(polyline))});
+	towns.forEach(function(town)
+	{
+		var flagArray = [fitRecursively(parseInt(town.townseed.substring(0,2)),11),fitRecursively(parseInt(town.townseed.substring(1,9)),7),fitRecursively(parseInt(town.townseed.substring(7,3)),7),fitRecursively(parseInt(town.townseed.substring(2,4)),7),fitRecursively(parseInt(town.townseed.substring(3,5)),11),fitRecursively(parseInt(town.townseed.substring(4,6)),7),fitRecursively(parseInt(town.townseed.substring(5,7)),17),fitRecursively(parseInt(town.townseed.substring(6,8)),7)];
+		var usedIcon = mainTownIcon;
+		if(town.branchedFrom !== "N/A")
+		{
+			usedIcon = subTownIcon;
+			addPolyline(town.branchedFrom,[[town.latitude,town.longitude],[getTownByRealName(town.branchedFrom).latitude,getTownByRealName(town.branchedFrom).longitude]],getTownColour(getTownByRealName(town.branchedFrom)));
+		}
+		addMarker(town.realName,mainTownIcon,town.latitude,town.longitude,"<a href='javascript:void(0)' onclick='generateTownPage(getTownByRealName("+'"'+town.realName+'"'+"))'>"+town.realName+"</a><br><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/>");
+		
+	});
 }
 
 
