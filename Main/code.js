@@ -116,6 +116,7 @@ function baseGenerator(year)
 	for(var i = 0; i<year; i++)
 	{
 		seed = ((seed+A)*B)%M;
+		
 	}
 	return seed;
 }
