@@ -32,29 +32,7 @@ function getFile($filename)
         return $loadedRes;
 }
 
-/* function processQueueItem()
-{
-	switch($taskQueue[0])
-	{
-		case "generateNewTownForYear":
-			if(substr(baseGenerator($year),0,2)>70)
-			{
-				getFile("numberofcities.txt");
-				$countryId = fitRecursively(substr(baseGenerator($year),1,3),235); //numerical value
-				$countryId = explode(",",$loadedRes)[0]; //text value
-				$countryTownCount = explode(",",$loadedRes)[1];
-				getFile("countries/".$countryId.".txt");
-				$town = $loadedRes[fitRecursively(substr(baseGenerator($year),2,7),(int)$countryTownCount)];
-				echo($town);
-			}
-			else
-			{
-				echo("no town");
-			}
-			
-			
-	}
-} */
+
 
 genTownForYear();
 function genTownForYear()
@@ -72,10 +50,10 @@ function genTownForYear()
         $townPicked = fitRecursively(substr($seed,2,7),explode(",",$countryLine)[1]);
         $town = $loadedRes[$townPicked];
         $townSplit = explode(",",$town);
-        echo($town);
-        $townObject = array(
+        $GLOBALS["towns"][$townSplit[1]] = array(
             "realName" => $townSplit[1],
             "realCountry" => $townSplit[0],
+          	"foundedYear" => $GLOBALS["cyear"],
             "realRegion" => $townSplit[3],
             "latitude" => $townSplit[5],
             "longitude" => $townSplit[6],
@@ -83,10 +61,12 @@ function genTownForYear()
             "happiness" => 100,
             "devLevel" => 100,
             "foodMod" => 5,
+          	"resources" => substr($townObject["townseed"],4,2),
+          	"branchedFrom" => "N/A",
+          	"partOf" => $townObject["realName"]
         );
-        array_push($GLOBALS["towns"],$townObject);
-        echo($townObject["realName"]);
-            //this function will generate the exact same out put as "loadCityNumbers","getCountryIdFromYear","getTownsInCountryFromId","loadCountryFromID","pickTown"
+        echo(end($GLOBALS["towns"])["realName"]);
+        //this function will generate the exact same out put as "loadCityNumbers","getCountryIdFromYear","getTownsInCountryFromId","loadCountryFromID","pickTown"
 
     }
     else
@@ -94,5 +74,60 @@ function genTownForYear()
         echo("no town");
     }
     echo("<br>");
+}
+function townIterate()
+{
+	foreach($GLOBALS["towns"] as &$town)
+    {
+    	$ratioseed = fmod($town["townseed"],baseGenerator[$GLOBALS["cyear"]]);
+      	$town["foodMod"] = substr($ratioseed,1,1)+1;
+      	if($town["foodMod"] == 2 || $town["foodMod"] == 3)
+        {
+          	$town["resources"] = $town["resources"] - 1;
+        }
+      	if($town["foodMod"] == 1)
+        {
+          	$town["resources"] = $town["resources"] - 2;
+        }
+      	if($town["foodMod"] == 8 || $town["foodMod"] == 9)
+        {
+          	$town["resources"] = $town["resources"] + 1;
+        }
+      	if($town["foodMod"] == 10)
+        {
+          	$town["resources"] = $town["resources"] + 2;
+        }
+        $town["population"] = $town["population"] + floor(($town["townseed"][1]*$GLOBALS["cyear"]-$town["foundedYear"]+1)/2);
+		$town["devLevel"] = $town["devLevel"] + substr(baseGenerator($GLOBALS["cyear"]),2,2) + floor(0.1*substr($town["townseed"]),1,2);
+      	if(substr($ratioseed,3,2) >= 50)
+        {
+          	$town["happiness"]++;
+        }
+      	else
+      	{
+          	$town["happiness"]--;
+      	}
+      	if($town["devLevel"] < $GLOBALS["towns"][$town["partOf"]]["devLevel"]/2)
+        {
+          	$GLOBALS["towns"][$town["partOf"]]["resources"]--;
+        }
+        if($town["resources"]<0)
+        {
+          	removeAll($town["partOf"]);
+        }
+      	
+      	
+    }
+
+}
+function removeAll($value)
+{
+  	foreach($GLOBALS["towns"] as &$aTown)
+    {
+      if($aTown["partOf"] == $value)
+      {
+        	unset($GLOBALS["towns"],$aTown);
+      }
+    }
 }
 ?>
