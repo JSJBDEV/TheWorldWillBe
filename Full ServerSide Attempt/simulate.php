@@ -1,7 +1,7 @@
 <?php
 $cyear = htmlspecialchars($_GET["year"]);
 $towns = [];
-$countries = array();
+$simfile = array();
 function baseGenerator($year)
 {
 	$seed = 1;
@@ -65,16 +65,21 @@ function genTownForYear()
             "branchedFrom" => "N/A",
             "partOf" => str_replace("'","`",$townSplit[1])
         );
-        echo(end($GLOBALS["towns"])["realName"]);
+        //echo(end($GLOBALS["towns"])["realName"]);
+        $GLOBALS["simfile"][$GLOBALS["cyear"]][$townSplit[1]] = array(
+            "longitude" => (float)$townSplit[6],
+            "latitude" => (float)$townSplit[5],
+            "branchedFrom" => "NA"
+        );
       	
         //this function will generate the exact same out put as "loadCityNumbers","getCountryIdFromYear","getTownsInCountryFromId","loadCountryFromID","pickTown"
 
     }
     else
     {
-        echo("no town");
+        //echo("no town");
     }
-    echo("<br>");
+    //echo("<br>");
 }
 
 function genBranchTown(&$parent)
@@ -108,8 +113,13 @@ function genBranchTown(&$parent)
             "branchedFrom" => $parent["realName"],
             "partOf" => $parent["partOf"]
         );
+    $GLOBALS["simfile"][$GLOBALS["cyear"]][$townSplit[1]] = array(
+            "longitude" => (float)$townSplit[6],
+            "latitude" => (float)$townSplit[5],
+            "branchedFrom" => $parent["realName"]
+        );
     $parent["resources"] = $parent["resources"] + $GLOBALS["towns"][$townSplit[1]]["resources"];
-    echo($parent["realName"]."(((".$parent["resources"].")))");
+    
 }
 function townIterate()
 {
@@ -140,7 +150,7 @@ function townIterate()
         }
         
       	
-        $town["population"] = $town["population"] + floor((substr($town["townseed"],1,1)*($GLOBALS["cyear"]-$town["foundedYear"])+1)/2);
+        $town["population"] = $town["population"] + floor((substr($town["totwnseed"],1,1)*($GLOBALS["cyear"]-$town["foundedYear"])+1)/2);
         
 	$town["devLevel"] = $town["devLevel"] + (int)substr(baseGenerator($GLOBALS["cyear"]),2,2) + floor(0.1*substr($town["townseed"]),1,2);
         
@@ -160,7 +170,7 @@ function townIterate()
         if($town["resources"]<0)
         {
           	removeAll($town["partOf"]);
-                echo($town["realName"]." has Fallen");
+                //echo($town["realName"]." has Fallen");
         }
         if($town["population"]>$town["devLevel"])
         {
@@ -181,7 +191,8 @@ function doYears()
         $GLOBALS["cyear"] = $GLOBALS["cyear"]+1;
         
     }
-    
+    //echo(json_encode($GLOBALS["simfile"]));
+    echo("finished");
 }
 function removeAll($value)
 {
