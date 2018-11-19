@@ -1,8 +1,15 @@
-import urllib.request, math
+import urllib.request, math, argparse, json
 global year,towns
 year = 0
+runLength = 1
 towns = []
 send = []
+
+parser = argparse.ArgumentParser()
+parser.add_argument("years",help = "runs program for X years")
+parser.add_argument("--town",help = "returns a specific object from the generated year")
+args = parser.parse_args()
+runLength = args.years
 def baseGenerator(year):
     seed = 1
     A = 234233466321
@@ -56,7 +63,9 @@ def genTownForYear():
             }
         #print(townObject)
         towns.append(townObject)
-        send.append(townObject["realName"]+" starts")
+        send.append(townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"])
+    else:
+        send.append("-")
 
 def genBranchTown(parent):
     seed = baseGenerator(year)
@@ -86,7 +95,7 @@ def genBranchTown(parent):
         }
     #print(townObject)
     towns.append(townObject)
-    send.append(townObject["realName"]+" starts")
+    send.append("~"+townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"]+","+townObject["branchedFrom"])
     parent["resources"] = parent["resources"] + townObject["resources"]
 
 def townIterate():
@@ -128,7 +137,7 @@ def townIterate():
             delist = []
             for q in range(len(towns)):
                 if(towns[q]["partOf"] == towns[i]["partOf"]):
-                    send.append(towns[q]["realName"]+" is removed")
+                    send.append("#"+towns[q]["realName"])
                     delist.append(towns[q])
             for q in range(len(delist)):
                 towns.remove(delist[q])
@@ -142,8 +151,15 @@ def townIterate():
 
 
 
-for year in range(1,500):
+for year in range(1,int(runLength)):
     genTownForYear()
     townIterate()
     year = year + 1
-print(send)
+if args.town:
+    trueName = args.town.replace("_"," ")
+    for c in range(len(towns)):
+        if towns[c]["realName"] == trueName:
+            print(json.dumps(towns[c]))
+            break
+else:
+    print(json.dumps(send))
