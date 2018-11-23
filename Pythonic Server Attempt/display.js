@@ -109,6 +109,7 @@ function runSim()
 	{
 		mark = process.substring(1).split(",");
 		addMarker(mark[0],subTownIcon,mark[1],mark[2],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+mark[0]+'"'+")'>"+mark[0]+"</a><br>");
+		addPolyline(mark[3],[[mark[1],mark[2]],[]],"red");
 		
 	}
 	else if(process[0] == "#") //symbolises a marker to be removed
@@ -139,3 +140,5 @@ function playpause()
 	runSim();
 	
 }
+
+

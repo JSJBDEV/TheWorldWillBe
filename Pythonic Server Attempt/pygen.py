@@ -99,7 +99,7 @@ def genBranchTown(parent):
     parent["resources"] = parent["resources"] + townObject["resources"]
 
 def townIterate():
-    for i in range(len(towns)-1):
+    for i in range(len(towns)):
         try:
             ratioseed = math.fmod(towns[i]["townseed"],baseGenerator(year))
             towns[i]["foodMod"] = int(str(ratioseed)[1:2])+1
@@ -147,7 +147,26 @@ def townIterate():
         if(towns[i]["population"] > towns[i]["devLevel"]):
             genBranchTown(towns[i])
             towns[i]["population"] = towns[i]["population"] / 2
+            
+        for f in range(len(towns)):
+            if(haversine(towns[i]["latitude"],towns[i]["longitude"],towns[f]["latitude"],towns[f]["longitude"])<towns[i]["devLevel"]*1000):
+                if(int(str(ratioseed)[5:8])<30):
+                    if towns[i]["partOf"] != towns[f]["partOf"]: 
+                        print(towns[i]["realName"]+"   "+towns[f]["realName"])
+                    
 
+def haversine(lat1,long1,lat2,long2):
+    R = 6371e3
+    φ1 = math.radians(float(lat1))
+    φ2 = math.radians(float(lat2))
+    Δφ = math.radians(float(lat2)-float(lat1))
+    Δλ = math.radians(float(long2)-float(long1))
+
+    a = math.sin(Δφ/2) * math.sin(Δφ/2) + math.cos(φ1) * math.cos(φ2) * math.sin(Δλ/2) * math.sin(Δλ/2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+
+    d = R * c
+    return d
 
 
 
