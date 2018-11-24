@@ -109,7 +109,7 @@ function runSim()
 	{
 		mark = process.substring(1).split(",");
 		addMarker(mark[0],subTownIcon,mark[1],mark[2],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+mark[0]+'"'+")'>"+mark[0]+"</a><br>");
-		addPolyline(mark[3],[[mark[1],mark[2]],[]],"red");
+		addPolyline(mark[3],[[mark[1],mark[2]],[getMarkerByName(mark[3])._latlng.lat,getMarkerByName(mark[3])._latlng.lng]],"red");
 		
 	}
 	else if(process[0] == "#") //symbolises a marker to be removed
@@ -119,6 +119,10 @@ function runSim()
 	else if(process[0] == "-")
 	{
 		//(do nothing)
+		
+	}
+	else if(process[0] == "$")
+	{
 		year++;
 		document.getElementById("year").innerHTML="Year: "+year;
 	}
@@ -139,6 +143,10 @@ function playpause()
 {
 	runSim();
 	
+}
+function getMarkerByName(name)
+{
+	return markers.find(x => x.options.title == name);
 }
 
 

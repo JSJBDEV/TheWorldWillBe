@@ -64,8 +64,7 @@ def genTownForYear():
         #print(townObject)
         towns.append(townObject)
         send.append(townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"])
-    else:
-        send.append("-")
+    
 
 def genBranchTown(parent):
     seed = baseGenerator(year)
@@ -167,17 +166,24 @@ def haversine(lat1,long1,lat2,long2):
 
     d = R * c
     return d
-
+def getTownByRealName(name):
+    for i in range(len(towns)):
+        if towns[i]["realName"]:
+            return towns[i]
 
 
 for year in range(1,int(runLength)):
     genTownForYear()
     townIterate()
     year = year + 1
+    send.append("$")
 if args.town:
     trueName = args.town.replace("_"," ")
     for c in range(len(towns)):
         if towns[c]["realName"] == trueName:
+            zeed = str(getTownByRealName(towns[c]["partOf"])["townseed"])
+            flagArray = [fitRecursively(int(zeed[0:2]),11),fitRecursively(int(zeed[1:3]),7),fitRecursively(int(zeed[2:4]),7),fitRecursively(int(zeed[3:5]),7),fitRecursively(int(zeed[4:6]),11),fitRecursively(int(zeed[5:7]),7),fitRecursively(int(zeed[6:8]),17),fitRecursively(int(zeed[7:9]),7)]
+            print("<img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+str(flagArray[0])+"&c1="+str(flagArray[1])+"&c2="+str(flagArray[2])+"&c3="+str(flagArray[3])+"&o="+str(flagArray[4])+"&c4="+str(flagArray[5])+"&s="+str(flagArray[6])+"&c5="+str(flagArray[7])+"' alt='svg' width='60' height='40'/>")
             print(json.dumps(towns[c]))
             break
 else:
