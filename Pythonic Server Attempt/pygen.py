@@ -146,13 +146,30 @@ def townIterate():
         if(towns[i]["population"] > towns[i]["devLevel"]):
             genBranchTown(towns[i])
             towns[i]["population"] = towns[i]["population"] / 2
-            
-        for f in range(len(towns)):
-            if(haversine(towns[i]["latitude"],towns[i]["longitude"],towns[f]["latitude"],towns[f]["longitude"])<towns[i]["devLevel"]*1000):
-                if(int(str(ratioseed)[5:8])<30):
-                    if towns[i]["partOf"] != towns[f]["partOf"]: 
-                        print(towns[i]["realName"]+"   "+towns[f]["realName"])
-                    
+        try:    
+            for f in range(len(towns)-1):
+                if(haversine(towns[i]["latitude"],towns[i]["longitude"],towns[f]["latitude"],towns[f]["longitude"])<towns[i]["devLevel"]*1000):
+                    if(int(str(ratioseed)[5:8])<30):
+                        if towns[i]["partOf"] != towns[f]["partOf"]: 
+                            #print(towns[i]["realName"]+"   "+towns[f]["realName"])
+                            if(towns[i]["devLevel"]>towns[f]["population"]):
+                                send.append(".")
+                                delist = []
+                                for t in range(len(towns)):
+                                    if(towns[t]["partOf"] == towns[f]["partOf"]):
+                                        send.append("#"+towns[t]["realName"])
+                                        delist.append(towns[t])
+
+                                for t in range(len(delist)):
+                                    
+                                    try:
+                                        towns.remove(delist[t])
+                                    except:
+                                        continue
+                                    delist = []    
+                                send.append(",")
+        except:
+            continue
 
 def haversine(lat1,long1,lat2,long2):
     R = 6371e3

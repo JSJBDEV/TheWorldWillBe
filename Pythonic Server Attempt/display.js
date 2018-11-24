@@ -126,6 +126,14 @@ function runSim()
 		year++;
 		document.getElementById("year").innerHTML="Year: "+year;
 	}
+	else if(process[0] == ".")
+	{
+		console.log("battle started");
+	}
+	else if(process[0] == ",")
+	{
+		console.log("battle ended");
+	}
 	else //refers to a normally generated town
 	{
 		mark = process.split(",");
