@@ -97,7 +97,7 @@ function getFile(url) //using a simple fetch method I can grab my libraries.
 
 function fetchSimfile(runlength)
 {
-	getFile("testingpy.php?length="+runlength+"&town=NA");
+	getFile("testingpy.php?length="+runlength+"&town=NA&option=simple");
 	
 }
 var year = 1;
@@ -115,6 +115,14 @@ function runSim()
 	else if(process[0] == "#") //symbolises a marker to be removed
 	{
 		map.removeLayer(markers.find(x => x.options.title == process.substring(1)));
+		//map.removeLayer(polylines.find(x => x.options.townFrom == process.substring(1)));
+		polylines.forEach(function(line)
+		{
+			if(line.options.townFrom == process.substring(1))
+			{
+				map.removeLayer(line)
+			}
+		});
 	}
 	else if(process[0] == "-")
 	{
@@ -145,7 +153,7 @@ function runSim()
 function makeDynamicLink(townName)
 {
 	console.log("it worked");
-	document.getElementById("towninfo").innerHTML = "<iframe height=200 width=200 src='testingpy.php?length="+(year+1)+"&town="+townName.replace(/ /g,"_")+"'></iframe>";
+	document.getElementById("towninfo").innerHTML = "<iframe height=200 width=200 src='testingpy.php?length="+(year+1)+"&option=town&town="+townName.replace(/ /g,"_")+"'></iframe>";
 }
 function playpause()
 {

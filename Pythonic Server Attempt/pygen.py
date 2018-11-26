@@ -8,6 +8,7 @@ send = []
 parser = argparse.ArgumentParser()
 parser.add_argument("years",help = "runs program for X years")
 parser.add_argument("--town",help = "returns a specific object from the generated year")
+parser.add_argument("--full",help = "dumps the full dictionary of towns for the generated year", action="store_true")
 args = parser.parse_args()
 runLength = args.years
 def baseGenerator(year):
@@ -104,7 +105,7 @@ def townIterate():
             towns[i]["foodMod"] = int(str(ratioseed)[1:2])+1
         except:
             continue
-        
+        parentTown = towns[i]
         if towns[i]["branchedFrom"] != "NA":
             for v in range(len(towns)-1):
                 if towns[v]["realName"] == towns[i]["branchedFrom"]:
@@ -112,6 +113,7 @@ def townIterate():
                     break
         else:
             parentTown = towns[i]
+            
         if towns[i]["foodMod"] == 2 or towns[i]["foodMod"] == 3:
             parentTown["resources"] = parentTown["resources"]-1
         if towns[i]["foodMod"] == 8 or towns[i]["foodMod"] == 9:
@@ -124,15 +126,15 @@ def townIterate():
         towns[i]["population"] = towns[i]["population"] + math.floor((int(str(towns[i]["townseed"])[1])*(year-towns[i]["foundedYear"]+1))/2)
         towns[i]["devLevel"] = towns[i]["devLevel"] + int(str(baseGenerator(year))[2:4]) + math.floor(0.1*int(str(towns[i]["townseed"])[1:3]))
 
-        if(int(str(ratioseed)[3:5]) >=50):
+        if int(str(ratioseed)[3:5]) >=50:
             towns[i]["happiness"] = towns[i]["happiness"] + 1
         else:
             towns[i]["happiness"] = towns[i]["happiness"] - 1
             
-        if(towns[i]["devLevel"]<parentTown["devLevel"]):
+        if towns[i]["devLevel"]< parentTown["devLevel"]:
             parentTown["resources"] = parentTown["resources"] - 1
 
-        if(towns[i]["resources"]<0):
+        if towns[i]["resources"]<0:
             delist = []
             for q in range(len(towns)):
                 if(towns[q]["partOf"] == towns[i]["partOf"]):
@@ -148,25 +150,16 @@ def townIterate():
             towns[i]["population"] = towns[i]["population"] / 2
         try:    
             for f in range(len(towns)-1):
-                if(haversine(towns[i]["latitude"],towns[i]["longitude"],towns[f]["latitude"],towns[f]["longitude"])<towns[i]["devLevel"]*1000):
+                if(haversine(towns[i]["latitude"],towns[i]["longitude"],towns[f]["latitude"],towns[f]["longitude"])<towns[i]["devLevel"]*500):
                     if(int(str(ratioseed)[5:8])<30):
                         if towns[i]["partOf"] != towns[f]["partOf"]: 
                             #print(towns[i]["realName"]+"   "+towns[f]["realName"])
                             if(towns[i]["devLevel"]>towns[f]["population"]):
                                 send.append(".")
                                 delist = []
-                                for t in range(len(towns)):
-                                    if(towns[t]["partOf"] == towns[f]["partOf"]):
-                                        send.append("#"+towns[t]["realName"])
-                                        delist.append(towns[t])
-
-                                for t in range(len(delist)):
-                                    
-                                    try:
-                                        towns.remove(delist[t])
-                                    except:
-                                        continue
-                                    delist = []    
+                                send.append("#"+towns[f]["realName"])
+                                towns.remove(towns[f])
+                                parentTown["resources"] = parentTown["resources"]-50
                                 send.append(",")
         except:
             continue
@@ -203,5 +196,7 @@ if args.town:
             print("<img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+str(flagArray[0])+"&c1="+str(flagArray[1])+"&c2="+str(flagArray[2])+"&c3="+str(flagArray[3])+"&o="+str(flagArray[4])+"&c4="+str(flagArray[5])+"&s="+str(flagArray[6])+"&c5="+str(flagArray[7])+"' alt='svg' width='60' height='40'/>")
             print(json.dumps(towns[c]))
             break
+elif args.full:
+    print(json.dumps(towns))
 else:
     print(json.dumps(send))
