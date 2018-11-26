@@ -1,7 +1,7 @@
 <?php 
 $runlen = (int)htmlspecialchars($_GET["length"]);
 $aTown = htmlspecialchars($_GET["town"]);
-$option = htmlspecialchars($_GET["option"])
+$option = htmlspecialchars($_GET["option"]);
 
 
 switch($option)
@@ -13,8 +13,10 @@ switch($option)
 	case "town":
 		$output = passthru("python pygen.py ".$runlen." --town ".$aTown);
 		echo($output);
+		break;
 	case "year":
 		$output = passthru("python pygen.py ".$runlen." --full");
 		echo($output);
+		break;
 }
 ?>

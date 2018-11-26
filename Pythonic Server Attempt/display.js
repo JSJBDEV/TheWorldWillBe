@@ -82,7 +82,11 @@ function removeMarker(id)
 	map.removeLayer(markers[id]);
 	markers.splice(id);
 }
+
+//-----//
+
 var loadedRes = [];
+var fileStore = [];
 var cyear = 0;
 function getFile(url) //using a simple fetch method I can grab my libraries.
 {
@@ -90,8 +94,8 @@ function getFile(url) //using a simple fetch method I can grab my libraries.
   .then(function(response) {
     return response.text();
   }).then(function(text) { 
-	loadedRes = JSON.parse(text);
-	return loadedRes;
+	fileStore = JSON.parse(text);
+	return fileStore;
 });
 }
 
@@ -103,19 +107,24 @@ function fetchSimfile(runlength)
 var year = 1;
 function runSim()
 {
+	if(loadedRes = [])
+	{
+		loadedRes = fileStore;
+	}
 	process = loadedRes[0];
 	
 	if(process[0] == "~") //symbolises a branched town
 	{
 		mark = process.substring(1).split(",");
+		console.log(mark[0] +" has branched from "+mark[3]);
 		addMarker(mark[0],subTownIcon,mark[1],mark[2],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+mark[0]+'"'+")'>"+mark[0]+"</a><br>");
 		addPolyline(mark[3],[[mark[1],mark[2]],[getMarkerByName(mark[3])._latlng.lat,getMarkerByName(mark[3])._latlng.lng]],"red");
 		
 	}
 	else if(process[0] == "#") //symbolises a marker to be removed
 	{
+		console.log(process.substring(1)+" has fallen")
 		map.removeLayer(markers.find(x => x.options.title == process.substring(1)));
-		//map.removeLayer(polylines.find(x => x.options.townFrom == process.substring(1)));
 		polylines.forEach(function(line)
 		{
 			if(line.options.townFrom == process.substring(1))
@@ -136,15 +145,16 @@ function runSim()
 	}
 	else if(process[0] == ".")
 	{
-		console.log("battle started");
+		console.log("---battle started---");
 	}
 	else if(process[0] == ",")
 	{
-		console.log("battle ended");
+		console.log("===battle ended===");
 	}
 	else //refers to a normally generated town
 	{
 		mark = process.split(",");
+		console.log(mark[0]+ " has risen!");
 		addMarker(mark[0],mainTownIcon,mark[1],mark[2],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+mark[0]+'"'+")'>"+mark[0]+"</a><br>");
 	}
 	loadedRes.shift();
@@ -154,6 +164,11 @@ function makeDynamicLink(townName)
 {
 	console.log("it worked");
 	document.getElementById("towninfo").innerHTML = "<iframe height=200 width=200 src='testingpy.php?length="+(year+1)+"&option=town&town="+townName.replace(/ /g,"_")+"'></iframe>";
+}
+function examine()
+{
+	getFile("testingpy.php?length="+runlength+"&option=year");
+	setTimeout(function(){})
 }
 function playpause()
 {
