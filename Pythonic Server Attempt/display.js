@@ -124,7 +124,15 @@ function runSim()
 	else if(process[0] == "#") //symbolises a marker to be removed
 	{
 		console.log(process.substring(1)+" has fallen")
-		map.removeLayer(markers.find(x => x.options.title == process.substring(1)));
+		map.removeLayer(markers.find(function(marker)
+		{
+			if(marker.options.title == process.substring(1))
+			{
+				console.log("markerRemoved");
+				return true;
+			}
+		}));
+		
 		polylines.forEach(function(line)
 		{
 			if(line.options.townFrom == process.substring(1))
