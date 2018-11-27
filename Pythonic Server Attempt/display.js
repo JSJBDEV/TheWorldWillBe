@@ -107,7 +107,7 @@ function fetchSimfile(runlength)
 var year = 1;
 function runSim()
 {
-	if(loadedRes = [])
+	if(loadedRes.length < 1)
 	{
 		loadedRes = fileStore;
 	}
@@ -162,18 +162,33 @@ function runSim()
 }
 function makeDynamicLink(townName)
 {
-	console.log("it worked");
-	document.getElementById("towninfo").innerHTML = "<iframe height=200 width=200 src='testingpy.php?length="+(year+1)+"&option=town&town="+townName.replace(/ /g,"_")+"'></iframe>";
+	document.getElementById("towninfo").innerHTML = pretifyJson(fileStore.find(x => x.realName == townName));
+	//below is ineffecient//
+	//document.getElementById("towninfo").innerHTML = "<iframe height=200 width=200 src='testingpy.php?length="+(year+1)+"&option=town&town="+townName.replace(/ /g,"_")+"'></iframe>";
+	
 }
-function examine()
+function pretifyJson(obj)
 {
-	getFile("testingpy.php?length="+runlength+"&option=year");
-	setTimeout(function(){})
+	var tabletext = "<table border='1'>"
+	for(line in obj)
+	{
+		tabletext += "<tr><td>" + line + "</td><td>" + obj[line] + "</td><tr>";
+	}
+	tabletext += "</table>";
+	return tabletext;
+	
 }
+
 function playpause()
 {
 	runSim();
 	
+}
+function examine()
+{
+	//also clear Interval here.
+	getFile("testingpy.php?length="+runlength+"&option=year")
+	console.log("loading year")
 }
 function getMarkerByName(name)
 {
