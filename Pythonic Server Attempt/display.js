@@ -71,9 +71,9 @@ function removePolygon(id)
 	polygons.splice(id);
 }
 
-function addMarker(name,iconIn,lat,lon,desc)
+function addMarker(name,origin,iconIn,lat,lon,desc)
 {
-	var marker = L.marker([lat,lon],{icon: iconIn, title:name}).addTo(map).bindPopup(desc);
+	var marker = L.marker([lat,lon],{icon: iconIn, title:name, torigin:origin}).addTo(map).bindPopup(desc);
 	markers.push(marker);
 	return markers;
 }
@@ -117,27 +117,29 @@ function runSim()
 	{
 		mark = process.substring(1).split(",");
 		console.log(mark[0] +" has branched from "+mark[3]);
-		addMarker(mark[0],subTownIcon,mark[1],mark[2],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+mark[0]+'"'+")'>"+mark[0]+"</a><br>");
+		addMarker(mark[0],mark[4],subTownIcon,mark[1],mark[2],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+mark[0]+'"'+")'>"+mark[0]+"</a><br>");
 		addPolyline(mark[3],[[mark[1],mark[2]],[getMarkerByName(mark[3])._latlng.lat,getMarkerByName(mark[3])._latlng.lng]],"red");
 		
 	}
 	else if(process[0] == "#") //symbolises a marker to be removed
 	{
 		console.log(process.substring(1)+" has fallen")
-		map.removeLayer(markers.find(function(marker)
+		markers.find(function(marker)
 		{
 			if(marker.options.title == process.substring(1))
 			{
-				console.log("markerRemoved");
+				map.removeLayer(marker);
+				//markers.splice(marker);
 				return true;
-			}
-		}));
+		}
+		});
 		
 		polylines.forEach(function(line)
 		{
 			if(line.options.townFrom == process.substring(1))
 			{
-				map.removeLayer(line)
+				map.removeLayer(line);
+				//polylines.splice(line);
 			}
 		});
 	}
@@ -163,7 +165,7 @@ function runSim()
 	{
 		mark = process.split(",");
 		console.log(mark[0]+ " has risen!");
-		addMarker(mark[0],mainTownIcon,mark[1],mark[2],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+mark[0]+'"'+")'>"+mark[0]+"</a><br>");
+		addMarker(mark[0],mark[0],mainTownIcon,mark[1],mark[2],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+mark[0]+'"'+")'>"+mark[0]+"</a><br>");
 	}
 	loadedRes.shift();
 	
