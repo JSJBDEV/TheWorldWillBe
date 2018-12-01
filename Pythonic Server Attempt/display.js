@@ -124,14 +124,14 @@ function runSim()
 	else if(process[0] == "#") //symbolises a marker to be removed
 	{
 		console.log(process.substring(1)+" has fallen")
-		markers.find(function(marker)
+		markers.forEach(function(marker)
 		{
 			if(marker.options.title == process.substring(1))
 			{
 				map.removeLayer(marker);
 				//markers.splice(marker);
-				return true;
-		}
+			}
+		
 		});
 		
 		polylines.forEach(function(line)
@@ -171,6 +171,8 @@ function runSim()
 	loadedRes.shift();
 	
 	
+	
+	
 }
 function makeDynamicLink(townName)
 {
@@ -198,13 +200,41 @@ function playpause()
 }
 function examine()
 {
-	//also clear Interval here.
-	getFile("testingpy.php?length="+runlength+"&option=year")
-	console.log("loading year")
+	
+	markers.forEach(function(marker)
+	{
+		map.removeLayer(marker);
+	});
+	markers = []
+	polylines.forEach(function(line)
+	{
+		map.removeLayer(line);
+	});
+	fileStore.forEach(function(town)
+	{
+		console.log(town["realName"]);
+		if(town["branchedFrom"] == "NA")
+		{
+			addMarker(town["realName"],town["partOf"],mainTownIcon,town["latitude"],town["longitude"],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+town["realName"]+'"'+")'>"+town["realName"]+"</a><br>");
+		}
+		else
+		{
+			addMarker(town["realName"],town["partOf"],subTownIcon,town["latitude"],town["longitude"],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+town["realName"]+'"'+")'>"+town["realName"]+"</a><br>");
+			try
+			{
+			addPolyline(town["branchedFrom"],[[town["latitude"],town["longitude"]],[getTownByName(town["branchedFrom"])["latitude"],getTownByName(town["branchedFrom"])["longitude"]]],"red");
+			}
+			catch{}
+		}
+	});
 }
 function getMarkerByName(name)
 {
 	return markers.find(x => x.options.title == name);
+}
+function getTownByName(name)
+{
+	return fileStore.find(x => x["realName"] == name);
 }
 
 

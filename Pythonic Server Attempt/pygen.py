@@ -148,7 +148,7 @@ def townIterate():
         parentTown = town
         if town["branchedFrom"] != "NA":
             for v in towns:
-                if v["realName"] == town["partOf"]:
+                if v["realName"] == town["branchedFrom"]:
                     parentTown = v
                     break
         else:
@@ -201,11 +201,15 @@ def townIterate():
                 towns.remove(town)
 
         
-        if town["population"] == 1 and year-town["foundedYear"]>5:
-            send.append("#"+town["realName"])
-            towns.remove(town)
-            
+       # if town["population"] == 1 and year-town["foundedYear"]>5:
+       #     send.append("#"+town["realName"])
+       #     towns.remove(town)
 
+    for t in towns:
+        if "#"+t["partOf"] in send: 
+            send.append("#"+town["realName"])
+            towns.remove(t)
+    
             
 def haversine(lat1,long1,lat2,long2):
     R = 6371e3
