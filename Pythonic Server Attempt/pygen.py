@@ -47,7 +47,7 @@ def genTownForYear():
         town = file[int(tid)];
         tsplit = town.split(",")
         townObject = {
-                "realName":tsplit[1].replace("'","`"),
+                "realName":"="+tsplit[1].replace("'","`"),
                 "realCountry":tsplit[0],
                 "foundedYear":year,
                 "realRegion":tsplit[3],
@@ -60,7 +60,7 @@ def genTownForYear():
                 "foodMod":5,
                 "resources":int(str(baseGenerator(222+len(towns)))[4:6]),
                 "branchedFrom":"NA",
-                "partOf":tsplit[1].replace("'","`")
+                "partOf":"="+tsplit[1].replace("'","`")
             }
         #print(townObject)
         towns.append(townObject)
@@ -98,62 +98,115 @@ def genBranchTown(parent):
     send.append("~"+townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"]+","+townObject["branchedFrom"]+","+townObject["partOf"])
     parent["resources"] = parent["resources"] + townObject["resources"]
 
+def genColonyTown(parent):
+    seed = baseGenerator(year)
+    test = getFile("compare.txt")
+    close = []
+    for line in test:
+        onLine = line.split(",")
+        if haversine(float(onLine[5]),float(onLine[6]),parent["latitude"],parent["longitude"]) < 200*parent["devLevel"]:
+            close.append(onLine)
+
+    regionPicked = close[fitRecursively(int(str(seed*3)[2:4]),len(close))]
+        
+    file = getFile("countries/"+regionPicked[0]+".txt")
+    region = []
+    for i in range(len(file)-1):
+        if file[i].split(",")[3] == regionPicked[3]:
+            region.append(file[i])
+    tid = fitRecursively(int(str(seed)[2:9]),len(region))
+    town = file[int(tid)];
+    tsplit = town.split(",")
+    townObject = {
+            "realName":tsplit[1].replace("'","`"),
+            "realCountry":tsplit[0],
+            "foundedYear":year,
+            "realRegion":tsplit[3],
+            "latitude":tsplit[5],
+            "longitude":tsplit[6],
+            "townseed":baseGenerator(222+len(towns)),
+            "happiness":100,
+            "devLevel":100,
+            "population":1,
+            "foodMod":5,
+            "resources":int(str(baseGenerator(222+len(towns)))[4:6]),
+            "branchedFrom":parent["realName"],
+            "partOf":parent["partOf"]
+        }
+    #print(townObject)
+    towns.append(townObject)
+    send.append("~"+townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"]+","+townObject["branchedFrom"]+","+townObject["partOf"])
+    parent["resources"] = parent["resources"] + townObject["resources"]
+
 def townIterate():
-    for i in range(len(towns)):
+    for town in towns:
         try:
-            ratioseed = math.fmod(towns[i]["townseed"],baseGenerator(year))
-            towns[i]["foodMod"] = int(str(ratioseed)[1:2])+1
+            ratioseed = math.fmod(town["townseed"],baseGenerator(year))
+            town["foodMod"] = int(str(ratioseed)[1:2])+1
         except:
             continue
-        parentTown = towns[i]
-        if towns[i]["branchedFrom"] != "NA":
-            for v in range(len(towns)-1):
-                if towns[v]["realName"] == towns[i]["branchedFrom"]:
-                    parentTown = towns[v]
+        parentTown = town
+        if town["branchedFrom"] != "NA":
+            for v in towns:
+                if v["realName"] == town["partOf"]:
+                    parentTown = v
                     break
         else:
-            parentTown = towns[i]
+            parentTown = town
             
-        if towns[i]["foodMod"] == 2 or towns[i]["foodMod"] == 3:
+        if town["foodMod"] == 2 or town["foodMod"] == 3:
+            town["resources"] = town["resources"]-1
+        if town["foodMod"] == 8 or town["foodMod"] == 9:
+            town["resources"] = town["resources"]+1
+        if town["foodMod"] == 1:
             parentTown["resources"] = parentTown["resources"]-1
-        if towns[i]["foodMod"] == 8 or towns[i]["foodMod"] == 9:
+            town["resources"] = town["resources"]-1
+        if town["foodMod"] == 10:
             parentTown["resources"] = parentTown["resources"]+1
-        if towns[i]["foodMod"] == 1:
-            parentTown["resources"] = parentTown["resources"]-2
-        if towns[i]["foodMod"] == 10:
-            parentTown["resources"] = parentTown["resources"]+2
+            town["resources"] = town["resources"]+1
             
-        towns[i]["population"] = towns[i]["population"] + math.floor((int(str(towns[i]["townseed"])[1])*(year-towns[i]["foundedYear"]+1))/2)
-        towns[i]["devLevel"] = towns[i]["devLevel"] + int(str(baseGenerator(year))[2:4]) + math.floor(0.1*int(str(towns[i]["townseed"])[1:3]))
+        town["population"] = town["population"] + math.floor((int(str(town["townseed"])[1])*(year-town["foundedYear"]+1))/2)
+        town["devLevel"] = town["devLevel"] + int(str(baseGenerator(year))[2:4]) + math.floor(0.1*int(str(town["townseed"])[1:3]))
 
         if int(str(ratioseed)[3:5]) >=50:
-            towns[i]["happiness"] = towns[i]["happiness"] + 1
+            town["happiness"] = town["happiness"] + 1
         else:
-            towns[i]["happiness"] = towns[i]["happiness"] - 1
+            town["happiness"] = town["happiness"] - 1
             
-        if towns[i]["devLevel"]< parentTown["devLevel"]:
+        if town["devLevel"]< parentTown["devLevel"]:
             parentTown["resources"] = parentTown["resources"] - 1
        
-        if(towns[i]["population"] > towns[i]["devLevel"]):
-            genBranchTown(towns[i])
-            towns[i]["population"] = towns[i]["population"] / 2
+        if(town["population"] > town["devLevel"]):
+            town["population"] = town["population"] / 2
+            if(town["devLevel"]>5000):
+                genColonyTown(town)
+            else:
+                genBranchTown(town)
         
 			
         if(int(str(ratioseed)[5:7])<30):
             for f in towns:
-                if haversine(towns[i]["latitude"],towns[i]["longitude"],f["latitude"],f["longitude"])<towns[i]["devLevel"]*500 and towns[i]["partOf"] != f["partOf"]:
-                    if towns[i]["devLevel"]>f["population"]:
-                        removeAllBranchingTowns(f)
-                        send.append("#"+f["realName"])
-                        towns.remove(f)
-                        
+                if haversine(town["latitude"],town["longitude"],f["latitude"],f["longitude"])<town["devLevel"]*500 and town["partOf"] != f["partOf"]:
+                    if town["devLevel"]>f["population"]:
+                        parentTown["resources"] = parentTown["resources"]-5
+                        f["resources"] = f["resources"]-20
                         break;
 
-        if towns[i]["resources"]<0:
-            removeAllBranchingTowns(towns[i])
-            send.append("#"+f["realName"])
-            towns.remove(towns[i])
+        if town["resources"]<0:
+            if parentTown == town:
+                removeTownsInNation(town)
+            else:
+                parentTown["resources"] = parentTown["resources"]-10
+                send.append("#"+town["realName"])
+                towns.remove(town)
 
+        
+        if town["population"] == 1 and year-town["foundedYear"]>5:
+            send.append("#"+town["realName"])
+            towns.remove(town)
+            
+
+            
 def haversine(lat1,long1,lat2,long2):
     R = 6371e3
     φ1 = math.radians(float(lat1))
@@ -167,14 +220,13 @@ def haversine(lat1,long1,lat2,long2):
     d = R * c
     return d
 def getTownByRealName(name):
-    for i in range(len(towns)):
-        if towns[i]["realName"]:
-            return towns[i]
-
-def removeAllBranchingTowns(townIn): #this recursively follows a tree path until they are all removed
     for town in towns:
-        if town["branchedFrom"] == townIn["realName"]:
-            removeAllBranchingTowns(town)
+        if town["realName"]:
+            return town
+
+def removeTownsInNation(townIn):
+    for town in towns:
+        if town["partOf"] == townIn["realName"]:
             send.append("#"+town["realName"])
             towns.remove(town)
 

@@ -152,6 +152,7 @@ function runSim()
 	{
 		year++;
 		document.getElementById("year").innerHTML="Year: "+year;
+		console.log("@@@year: "+year+" @@@");
 	}
 	else if(process[0] == ".")
 	{
@@ -168,6 +169,7 @@ function runSim()
 		addMarker(mark[0],mark[0],mainTownIcon,mark[1],mark[2],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+mark[0]+'"'+")'>"+mark[0]+"</a><br>");
 	}
 	loadedRes.shift();
+	
 	
 }
 function makeDynamicLink(townName)
