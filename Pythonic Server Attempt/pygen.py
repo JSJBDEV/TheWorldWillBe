@@ -1,5 +1,5 @@
 import urllib.request, math, argparse, json
-global year,towns
+global year,towns,seed
 year = 0
 runLength = 1
 towns = []
@@ -9,10 +9,15 @@ parser = argparse.ArgumentParser()
 parser.add_argument("years",help = "runs program for X years")
 parser.add_argument("--town",help = "returns a specific object from the generated year")
 parser.add_argument("--full",help = "dumps the full dictionary of towns for the generated year", action="store_true")
+parser.add_argument("--seed",help = "changes the seed for the simulation, default is 1")
 args = parser.parse_args()
 runLength = args.years
+
 def baseGenerator(year):
-    seed = 1
+    if(args.seed):
+        seed = int(args.seed)
+    else:
+        seed = 1
     A = 234233466321
     B = 785432575563
     M = 924314325657
@@ -56,6 +61,8 @@ def genTownForYear():
                 "townseed":baseGenerator(222+len(towns)),
                 "happiness":100,
                 "devLevel":100,
+                "culture":0,
+                "military":1,
                 "population":1,
                 "foodMod":5,
                 "resources":int(str(baseGenerator(222+len(towns)))[4:6]),
@@ -87,6 +94,8 @@ def genBranchTown(parent):
             "townseed":baseGenerator(222+len(towns)),
             "happiness":100,
             "devLevel":100,
+            "culture":0,
+            "military":1,
             "population":1,
             "foodMod":5,
             "resources":int(str(baseGenerator(222+len(towns)))[4:6]),
@@ -127,6 +136,8 @@ def genColonyTown(parent):
             "townseed":baseGenerator(222+len(towns)),
             "happiness":100,
             "devLevel":100,
+            "culture":0,
+            "military":1,
             "population":1,
             "foodMod":5,
             "resources":int(str(baseGenerator(222+len(towns)))[4:6]),
@@ -140,6 +151,7 @@ def genColonyTown(parent):
 
 def townIterate():
     for town in towns:
+        #print(town)
         try:
             ratioseed = math.fmod(town["townseed"],baseGenerator(year))
             town["foodMod"] = int(str(ratioseed)[1:2])+1
@@ -184,10 +196,10 @@ def townIterate():
                 genBranchTown(town)
         
 			
-        if(int(str(ratioseed)[5:7])<30):
+        if(int(str(ratioseed)[5:7])<30*(1-town["culture"])): #this is a battle event.
             for f in towns:
                 if haversine(town["latitude"],town["longitude"],f["latitude"],f["longitude"])<town["devLevel"]*500 and town["partOf"] != f["partOf"]:
-                    if town["devLevel"]>f["population"]:
+                    if town["devLevel"]*town["military"]>f["population"]:
                         parentTown["resources"] = parentTown["resources"]-5
                         f["resources"] = f["resources"]-20
                         break;

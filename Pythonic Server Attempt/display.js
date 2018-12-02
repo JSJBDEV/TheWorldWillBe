@@ -255,9 +255,9 @@ function setUpTimeout()
 }
 function loadExamine()
 {
-	getFile("testingpy.php?length="+year+"&town=NA&option=year");
+	getFile("testingpy.php?length="+year+"&town=NA&option=year-seed&seed="+document.getElementById("seed").value);
 }
 function runSimForLen()
 {
-	fetchSimfile(document.getElementById("forLen").value);
+	getFile("testingpy.php?length="+document.getElementById("forLen").value+"&town=NA&option=simple-seed&seed="+document.getElementById("seed").value);
 }
