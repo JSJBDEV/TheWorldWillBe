@@ -88,13 +88,16 @@ function removeMarker(id)
 var loadedRes = [];
 var fileStore = [];
 var cyear = 0;
+var hasTimeout = false;
 function getFile(url) //using a simple fetch method I can grab my libraries.
 {
+	document.getElementById("loads").innerHTML = "loading file, please wait....";
 	fetch(url)
   .then(function(response) {
     return response.text();
   }).then(function(text) { 
 	fileStore = JSON.parse(text);
+	document.getElementById("loads").innerHTML = "file loaded";
 	return fileStore;
 });
 }
@@ -169,7 +172,17 @@ function runSim()
 		addMarker(mark[0],mark[0],mainTownIcon,mark[1],mark[2],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+mark[0]+'"'+")'>"+mark[0]+"</a><br>");
 	}
 	loadedRes.shift();
-	
+	if(hasTimeout)
+	{
+		if(loadedRes.length > 0)
+		{
+			setTimeout(runSim,50);
+		}
+		else
+		{
+			//get next files
+		}
+	}
 	
 	
 	
@@ -200,7 +213,6 @@ function playpause()
 }
 function examine()
 {
-	
 	markers.forEach(function(marker)
 	{
 		map.removeLayer(marker);
@@ -236,5 +248,16 @@ function getTownByName(name)
 {
 	return fileStore.find(x => x["realName"] == name);
 }
-
-
+function setUpTimeout()
+{
+	hasTimeout = true;
+	setTimeout(runSim,50);
+}
+function loadExamine()
+{
+	getFile("testingpy.php?length="+year+"&town=NA&option=year");
+}
+function runSimForLen()
+{
+	fetchSimfile(document.getElementById("forLen").value);
+}
