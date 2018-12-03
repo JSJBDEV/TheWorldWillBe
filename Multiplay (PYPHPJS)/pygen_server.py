@@ -4,6 +4,7 @@ year = 0
 runLength = 1
 towns = []
 send = []
+server = []
 
 parser = argparse.ArgumentParser()
 parser.add_argument("years",help = "runs program for X years")
@@ -71,7 +72,11 @@ def genTownForYear():
             }
         #print(townObject)
         towns.append(townObject)
+        
         send.append(townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"])
+        
+        server.append(townObject)
+        server.append(">")
     
 
 def genBranchTown(parent):
@@ -104,7 +109,10 @@ def genBranchTown(parent):
         }
     #print(townObject)
     towns.append(townObject)
+    server.append("~")
     send.append("~"+townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"]+","+townObject["branchedFrom"]+","+townObject["partOf"])
+    
+    server.append(townObject)
     parent["resources"] = parent["resources"] + townObject["resources"]
 
 def genColonyTown(parent):
@@ -146,7 +154,10 @@ def genColonyTown(parent):
         }
     #print(townObject)
     towns.append(townObject)
+    server.append("~")
     send.append("~"+townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"]+","+townObject["branchedFrom"]+","+townObject["partOf"])
+    
+    server.append(townObject)
     parent["resources"] = parent["resources"] + townObject["resources"]
 
 def townIterate():
@@ -210,6 +221,9 @@ def townIterate():
             else:
                 parentTown["resources"] = parentTown["resources"]-10
                 send.append("#"+town["realName"])
+                
+                server.append(town["realName"])
+                server.append("#")
                 towns.remove(town)
 
         
@@ -220,6 +234,9 @@ def townIterate():
     for t in towns:
         if "#"+t["partOf"] in send: 
             send.append("#"+town["realName"])
+            
+            server.append(town["realName"])
+            server.append("#")
             towns.remove(t)
     
             
@@ -244,6 +261,9 @@ def removeTownsInNation(townIn):
     for town in towns:
         if town["partOf"] == townIn["realName"]:
             send.append("#"+town["realName"])
+            
+            server.append(town["realName"])
+            server.append("#")
             towns.remove(town)
 
 for year in range(1,int(runLength)):
@@ -251,6 +271,7 @@ for year in range(1,int(runLength)):
     townIterate()
     year = year + 1
     send.append("$")
+    server.append("$")
 if args.town:
     trueName = args.town.replace("_"," ")
     for c in range(len(towns)):
@@ -263,4 +284,11 @@ if args.town:
 elif args.full:
     print(json.dumps(towns))
 else:
-    print(json.dumps(send))
+    #print(json.dumps(send))
+    final = []
+    for town in range(len(server)):
+        if(server[len(server)-2-town] != "$"):
+            final.append(server[len(server)-2-town])
+        else:
+            break
+    print(final)
