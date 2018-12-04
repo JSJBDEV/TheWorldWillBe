@@ -1,12 +1,12 @@
-import urllib.request, math, json
+import urllib.request, math, json, mysql.connector
 global year,towns,seed
 year = 0
 runLength = 1
 towns = []
 send = []
 server = []
-
-
+database = mysql.connector.connect(host="localhost",user="root",passwd="root",database="twwb")
+cursor = database.cursor()
 
 def baseGenerator(year):
     seed = 1
@@ -66,8 +66,10 @@ def genTownForYear():
         
         send.append(townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"])
         
-        server.append(townObject)
-        server.append(">")
+        sql = "INSERT INTO towns (realName,realCountry,realRegion,foundedYear,latitude,longitude,townseed,happiness,devLevel,culture,military,population,foodMod,resources,branchedFrom,partOf) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+        val = (townObject["realName"],townObject["realCountry"],townObject["realRegion"],townObject["foundedYear"],townObject["latitude"],townObject["longitude"],townObject["townObjectseed"],townObject["happiness"],townObject["devLevel"],townObject["culture"],townObject["military"],townObject["population"],townObject["foodMod"],townObject["resources"],townObject["branchedFrom"],townObject["partOf"])
+        cursor.execute(sql,val)
+        database.commit()
     
 
 def genBranchTown(parent):
@@ -102,9 +104,11 @@ def genBranchTown(parent):
     towns.append(townObject)
     
     send.append("~"+townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"]+","+townObject["branchedFrom"]+","+townObject["partOf"])
-    server.append("~")
+    sql = "INSERT INTO towns (realName,realCountry,realRegion,foundedYear,latitude,longitude,townseed,happiness,devLevel,culture,military,population,foodMod,resources,branchedFrom,partOf) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    val = (townObject["realName"],townObject["realCountry"],townObject["realRegion"],townObject["foundedYear"],townObject["latitude"],townObject["longitude"],townObject["townObjectseed"],townObject["happiness"],townObject["devLevel"],townObject["culture"],townObject["military"],townObject["population"],townObject["foodMod"],townObject["resources"],townObject["branchedFrom"],townObject["partOf"])
+    cursor.execute(sql,val)
+    database.commit()
     
-    server.append(townObject)
     parent["resources"] = parent["resources"] + townObject["resources"]
 
 def genColonyTown(parent):
@@ -148,9 +152,11 @@ def genColonyTown(parent):
     towns.append(townObject)
     server.append("~")
     send.append("~"+townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"]+","+townObject["branchedFrom"]+","+townObject["partOf"])
+    sql = "INSERT INTO towns (realName,realCountry,realRegion,foundedYear,latitude,longitude,townseed,happiness,devLevel,culture,military,population,foodMod,resources,branchedFrom,partOf) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    val = (townObject["realName"],townObject["realCountry"],townObject["realRegion"],townObject["foundedYear"],townObject["latitude"],townObject["longitude"],townObject["townObjectseed"],townObject["happiness"],townObject["devLevel"],townObject["culture"],townObject["military"],townObject["population"],townObject["foodMod"],townObject["resources"],townObject["branchedFrom"],townObject["partOf"])
+    cursor.execute(sql,val)
+    database.commit()
     
-    server.append(townObject)
-    parent["resources"] = parent["resources"] + townObject["resources"]
 
 def townIterate():
     for town in towns:
@@ -230,6 +236,8 @@ def townIterate():
             server.append(town["realName"])
             server.append("#")
             towns.remove(t)
+
+    sql = "UPDATE towns SET realName=%s,realCountry=%s,realRegion=%s,foundedYear=%s,latitude=%s,longitude=%s,seed=%s,happiness=%s,devLevel=%s,culture=%s,military=%s,population=%s,foodMod=%s,resources=%s,branchedFrom=%s,partOf=%s WHERE realName=%s AND realRegion=%s"
     
             
 def haversine(lat1,long1,lat2,long2):
@@ -269,11 +277,4 @@ def serverYear(yearz):
         year = year + 1
         send.append("$")
         server.append("$")
-
-    final = []
-    for town in range(len(server)):
-        if(server[len(server)-2-town] != "$"):
-            final.append(server[len(server)-2-town])
-        else:
-            break
-    print(final)
+    return towns
