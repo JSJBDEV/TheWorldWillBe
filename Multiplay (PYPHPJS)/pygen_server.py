@@ -1,4 +1,4 @@
-import urllib.request, math, argparse, json
+import urllib.request, math, json
 global year,towns,seed
 year = 0
 runLength = 1
@@ -6,19 +6,10 @@ towns = []
 send = []
 server = []
 
-parser = argparse.ArgumentParser()
-parser.add_argument("years",help = "runs program for X years")
-parser.add_argument("--town",help = "returns a specific object from the generated year")
-parser.add_argument("--full",help = "dumps the full dictionary of towns for the generated year", action="store_true")
-parser.add_argument("--seed",help = "changes the seed for the simulation, default is 1")
-args = parser.parse_args()
-runLength = args.years
+
 
 def baseGenerator(year):
-    if(args.seed):
-        seed = int(args.seed)
-    else:
-        seed = 1
+    seed = 1
     A = 234233466321
     B = 785432575563
     M = 924314325657
@@ -109,8 +100,9 @@ def genBranchTown(parent):
         }
     #print(townObject)
     towns.append(townObject)
-    server.append("~")
+    
     send.append("~"+townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"]+","+townObject["branchedFrom"]+","+townObject["partOf"])
+    server.append("~")
     
     server.append(townObject)
     parent["resources"] = parent["resources"] + townObject["resources"]
@@ -266,25 +258,18 @@ def removeTownsInNation(townIn):
             server.append("#")
             towns.remove(town)
 
-for year in range(1,int(runLength)):
-    genTownForYear()
-    townIterate()
-    year = year + 1
-    send.append("$")
-    server.append("$")
-if args.town:
-    trueName = args.town.replace("_"," ")
-    for c in range(len(towns)):
-        if towns[c]["realName"] == trueName:
-            zeed = str(getTownByRealName(towns[c]["partOf"])["townseed"])
-            flagArray = [fitRecursively(int(zeed[0:2]),11),fitRecursively(int(zeed[1:3]),7),fitRecursively(int(zeed[2:4]),7),fitRecursively(int(zeed[3:5]),7),fitRecursively(int(zeed[4:6]),11),fitRecursively(int(zeed[5:7]),7),fitRecursively(int(zeed[6:8]),17),fitRecursively(int(zeed[7:9]),7)]
-            print("<img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+str(flagArray[0])+"&c1="+str(flagArray[1])+"&c2="+str(flagArray[2])+"&c3="+str(flagArray[3])+"&o="+str(flagArray[4])+"&c4="+str(flagArray[5])+"&s="+str(flagArray[6])+"&c5="+str(flagArray[7])+"' alt='svg' width='60' height='40'/>")
-            print(json.dumps(towns[c]))
-            break
-elif args.full:
-    print(json.dumps(towns))
-else:
-    #print(json.dumps(send))
+
+
+
+def serverYear(yearz):
+    global year, send, server
+    for year in range(1,int(yearz)):
+        genTownForYear()
+        townIterate()
+        year = year + 1
+        send.append("$")
+        server.append("$")
+
     final = []
     for town in range(len(server)):
         if(server[len(server)-2-town] != "$"):
