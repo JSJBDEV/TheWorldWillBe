@@ -1,5 +1,5 @@
 import urllib.request, math, json, mysql.connector
-global year,towns,seed
+global year,towns,seed,database,cursor
 year = 0
 runLength = 1
 towns = []
@@ -67,7 +67,7 @@ def genTownForYear():
         send.append(townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"])
         
         sql = "INSERT INTO towns (realName,realCountry,realRegion,foundedYear,latitude,longitude,townseed,happiness,devLevel,culture,military,population,foodMod,resources,branchedFrom,partOf) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-        val = (townObject["realName"],townObject["realCountry"],townObject["realRegion"],townObject["foundedYear"],townObject["latitude"],townObject["longitude"],townObject["townObjectseed"],townObject["happiness"],townObject["devLevel"],townObject["culture"],townObject["military"],townObject["population"],townObject["foodMod"],townObject["resources"],townObject["branchedFrom"],townObject["partOf"])
+        val = (townObject["realName"],townObject["realCountry"],townObject["realRegion"],townObject["foundedYear"],townObject["latitude"],townObject["longitude"],townObject["townseed"],townObject["happiness"],townObject["devLevel"],townObject["culture"],townObject["military"],townObject["population"],townObject["foodMod"],townObject["resources"],townObject["branchedFrom"],townObject["partOf"])
         cursor.execute(sql,val)
         database.commit()
     
@@ -105,7 +105,7 @@ def genBranchTown(parent):
     
     send.append("~"+townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"]+","+townObject["branchedFrom"]+","+townObject["partOf"])
     sql = "INSERT INTO towns (realName,realCountry,realRegion,foundedYear,latitude,longitude,townseed,happiness,devLevel,culture,military,population,foodMod,resources,branchedFrom,partOf) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-    val = (townObject["realName"],townObject["realCountry"],townObject["realRegion"],townObject["foundedYear"],townObject["latitude"],townObject["longitude"],townObject["townObjectseed"],townObject["happiness"],townObject["devLevel"],townObject["culture"],townObject["military"],townObject["population"],townObject["foodMod"],townObject["resources"],townObject["branchedFrom"],townObject["partOf"])
+    val = (townObject["realName"],townObject["realCountry"],townObject["realRegion"],townObject["foundedYear"],townObject["latitude"],townObject["longitude"],townObject["townseed"],townObject["happiness"],townObject["devLevel"],townObject["culture"],townObject["military"],townObject["population"],townObject["foodMod"],townObject["resources"],townObject["branchedFrom"],townObject["partOf"])
     cursor.execute(sql,val)
     database.commit()
     
@@ -153,7 +153,7 @@ def genColonyTown(parent):
     server.append("~")
     send.append("~"+townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"]+","+townObject["branchedFrom"]+","+townObject["partOf"])
     sql = "INSERT INTO towns (realName,realCountry,realRegion,foundedYear,latitude,longitude,townseed,happiness,devLevel,culture,military,population,foodMod,resources,branchedFrom,partOf) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-    val = (townObject["realName"],townObject["realCountry"],townObject["realRegion"],townObject["foundedYear"],townObject["latitude"],townObject["longitude"],townObject["townObjectseed"],townObject["happiness"],townObject["devLevel"],townObject["culture"],townObject["military"],townObject["population"],townObject["foodMod"],townObject["resources"],townObject["branchedFrom"],townObject["partOf"])
+    val = (townObject["realName"],townObject["realCountry"],townObject["realRegion"],townObject["foundedYear"],townObject["latitude"],townObject["longitude"],townObject["townseed"],townObject["happiness"],townObject["devLevel"],townObject["culture"],townObject["military"],townObject["population"],townObject["foodMod"],townObject["resources"],townObject["branchedFrom"],townObject["partOf"])
     cursor.execute(sql,val)
     database.commit()
     
@@ -213,6 +213,12 @@ def townIterate():
                         f["resources"] = f["resources"]-20
                         break;
 
+        sql = "UPDATE towns SET realName=%s,realCountry=%s,realRegion=%s,foundedYear=%s,latitude=%s,longitude=%s,townseed=%s,happiness=%s,devLevel=%s,culture=%s,military=%s,population=%s,foodMod=%s,resources=%s,branchedFrom=%s,partOf=%s WHERE realName=%s AND realRegion=%s"
+        val = (town["realName"],town["realCountry"],town["realRegion"],town["foundedYear"],town["latitude"],town["longitude"],town["townseed"],town["happiness"],town["devLevel"],town["culture"],town["military"],town["population"],town["foodMod"],town["resources"],town["branchedFrom"],town["partOf"],town["realName"],town["realRegion"])
+        cursor.execute(sql,val)
+        database.commit()
+
+        
         if town["resources"]<0:
             if parentTown == town:
                 removeTownsInNation(town)
@@ -222,8 +228,13 @@ def townIterate():
                 
                 server.append(town["realName"])
                 server.append("#")
+                sql = "DELETE FROM towns WHERE realName = %s"
+                val = (town["realName"],)
+                cursor.execute(sql,val)
+                database.commit()
                 towns.remove(town)
-
+                
+            
         
        # if town["population"] == 1 and year-town["foundedYear"]>5:
        #     send.append("#"+town["realName"])
@@ -235,9 +246,14 @@ def townIterate():
             
             server.append(town["realName"])
             server.append("#")
+            sql = "DELETE FROM towns WHERE realName = %s"
+            val = (t["realName"],)
+            cursor.execute(sql,val)
+            database.commit()
             towns.remove(t)
-
-    sql = "UPDATE towns SET realName=%s,realCountry=%s,realRegion=%s,foundedYear=%s,latitude=%s,longitude=%s,seed=%s,happiness=%s,devLevel=%s,culture=%s,military=%s,population=%s,foodMod=%s,resources=%s,branchedFrom=%s,partOf=%s WHERE realName=%s AND realRegion=%s"
+            
+        
+    
     
             
 def haversine(lat1,long1,lat2,long2):
@@ -264,6 +280,11 @@ def removeTownsInNation(townIn):
             
             server.append(town["realName"])
             server.append("#")
+            server.append("#")
+            sql = "DELETE FROM towns WHERE realName = %s"
+            val = (town["realName"],)
+            cursor.execute(sql,val)
+            database.commit()
             towns.remove(town)
 
 
