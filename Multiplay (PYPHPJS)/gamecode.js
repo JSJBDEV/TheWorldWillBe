@@ -99,17 +99,20 @@ function getFile(url) //using a simple fetch method I can grab my libraries.
 	return fileStore;
 });
 }
-
 function profile()
 {
-	document.getElementById("map").setAttribute("hidden",true);
-	if(fileStore.length < 1)
+	if(document.getElementById("otherdata").innerHTML == "")
 	{
-		document.getElementById("otherdata").innerHTML = "<iframe src='twwb-game.php?action=signin&userId=3'></iframe>"
+		document.getElementById("otherdata").innerHTML = "<iframe src='twwb-game.php?action=signin' width=200 height=200 frameBorder='0'></iframe>";
 	}
+	document.getElementById("map").setAttribute("hidden",true);
+	document.getElementById("otherdata").removeAttribute("hidden");
+	
+	
 }
 function getMap()
 {
 	document.getElementById("map").removeAttribute("hidden");
+	document.getElementById("otherdata").setAttribute("hidden",true);
 	
 }
