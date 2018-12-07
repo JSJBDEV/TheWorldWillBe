@@ -297,5 +297,27 @@ def serverYear(yearz):
         townIterate()
         year = year + 1
         send.append("$")
-        server.append("$")
+    townfile = open("dumps/town_dump.txt","w+")
+    townfile.write(json.dumps(towns))
+    townfile.close()
+    yearfile = open("dumps/year_dump.txt","w+")
+    yearfile.write(str(year))
+    yearfile.close()
+    return towns
+
+
+def nextYear():
+    global year,send, server
+    genTownForYear()
+    townIterate()
+    yearfile = open("dumps/year_dump.txt","r+")
+    year = int(yearfile.read())
+    year = year + 1
+    send.append("$")
+    townfile = open("dumps/town_dump.txt","w+")
+    townfile.write(json.dumps(towns))
+    townfile.close()
+    yearfile = open("dumps/year_dump.txt","w+")
+    yearfile.write(str(year))
+    yearfile.close()
     return towns
