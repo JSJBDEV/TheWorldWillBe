@@ -321,3 +321,10 @@ def nextYear():
     yearfile.write(str(year))
     yearfile.close()
     return towns
+
+def restartServer():
+    global year, towns
+    yearfile = open("dumps/year_dump.txt","r+")
+    year = int(yearfile.read())
+    townfile = open("dumps/town_dump.txt","r+")
+    towns = json.loads(townfile.read())

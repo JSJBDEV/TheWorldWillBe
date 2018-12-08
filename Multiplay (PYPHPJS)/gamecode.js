@@ -89,22 +89,17 @@ function removeMarker(id)
 fileStore = [];
 function getFile(url) //using a simple fetch method I can grab my libraries.
 {
-	document.getElementById("loads").innerHTML = "loading file, please wait....";
 	fetch(url)
   .then(function(response) {
     return response.text();
   }).then(function(text) { 
 	fileStore = JSON.parse(text);
-	document.getElementById("loads").innerHTML = "file loaded";
 	return fileStore;
 });
 }
 function profile()
 {
-	if(document.getElementById("otherdata").innerHTML == "")
-	{
-		document.getElementById("otherdata").innerHTML = "<iframe src='twwb-game.php?action=signin' width=200 height=200 frameBorder='0'></iframe>";
-	}
+	document.getElementById("otherdata").innerHTML = "<iframe src='twwb-game.php?action=signin' width=500 height=500 frameBorder='0'></iframe>";
 	document.getElementById("map").setAttribute("hidden",true);
 	document.getElementById("otherdata").removeAttribute("hidden");
 	
@@ -116,3 +111,34 @@ function getMap()
 	document.getElementById("otherdata").setAttribute("hidden",true);
 	
 }
+
+function loadMap()
+{
+	fileStore.forEach(function(town)
+	{
+		console.log(town["realName"]);
+		if(town["branchedFrom"] == "NA")
+		{
+			addMarker(town["realName"],town["partOf"],mainTownIcon,town["latitude"],town["longitude"],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+town["realName"]+'"'+")'>"+town["realName"]+"</a><br>");
+		}
+		else
+		{
+			addMarker(town["realName"],town["partOf"],subTownIcon,town["latitude"],town["longitude"],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+town["realName"].replace(" ","_")+'"'+")'>"+town["realName"]+"</a><br>");
+			
+			addPolyline(town["branchedFrom"],[[town["latitude"],town["longitude"]],[getTownByName(town["branchedFrom"])["latitude"],getTownByName(town["branchedFrom"])["longitude"]]],"red");
+			
+		}
+	});
+}
+function makeDynamicLink(town)
+{
+	document.getElementById("otherdata").innerHTML = "<iframe src='twwb-game.php?action=loadTown&town="+town+"' width=500 height=500 frameBorder='0'></iframe>";
+	document.getElementById("map").setAttribute("hidden",true);
+	document.getElementById("otherdata").removeAttribute("hidden");
+}
+function getTownByName(name)
+{
+	return fileStore.find(x => x["realName"] == name);
+}
+getFile("dumps/town_dump.txt");
+setTimeout(loadMap,1000);
