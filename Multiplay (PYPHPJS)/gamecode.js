@@ -111,6 +111,12 @@ function getMap()
 	document.getElementById("otherdata").setAttribute("hidden",true);
 	
 }
+function getStats()
+{
+	document.getElementById("otherdata").innerHTML = "<iframe id=statframe src='twwb-game.php?action=stats&stat=dev' width=500 height=500 frameBorder='0'></iframe>";
+	document.getElementById("map").setAttribute("hidden",true);
+	document.getElementById("otherdata").removeAttribute("hidden");
+}
 
 function loadMap()
 {
@@ -119,26 +125,55 @@ function loadMap()
 		console.log(town["realName"]);
 		if(town["branchedFrom"] == "NA")
 		{
-			addMarker(town["realName"],town["partOf"],mainTownIcon,town["latitude"],town["longitude"],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+town["realName"]+'"'+")'>"+town["realName"]+"</a><br>");
+			addMarker(town["townId"],town["partOf"],mainTownIcon,town["latitude"],town["longitude"],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+town["townId"]+'"'+")'>"+town["realName"]+"</a><br>");
 		}
 		else
 		{
-			addMarker(town["realName"],town["partOf"],subTownIcon,town["latitude"],town["longitude"],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+town["realName"].replace(" ","_")+'"'+")'>"+town["realName"]+"</a><br>");
+			addMarker(town["townId"],town["partOf"],subTownIcon,town["latitude"],town["longitude"],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+town["townId"]+'"'+")'>"+town["realName"]+"</a><br>");
 			
 			addPolyline(town["branchedFrom"],[[town["latitude"],town["longitude"]],[getTownByName(town["branchedFrom"])["latitude"],getTownByName(town["branchedFrom"])["longitude"]]],"red");
 			
 		}
 	});
 }
+function switchLocation(newLoc)
+{
+	fetch("twwb-game.php?action=move&newLocation="+newLoc);
+	
+	document.getElementById("map").removeAttribute("hidden");
+	document.getElementById("otherdata").setAttribute("hidden",true);
+	map.panTo(getMarkerByName(newLoc)._latlng);
+	
+}
+
+function lookup()
+{
+	var sel = document.getElementById("statframe").contentWindow.document.getElementById("statz");
+	document.getElementById("otherdata").innerHTML = "<iframe src='twwb-game.php?action=stats&stat="+sel.options[sel.selectedIndex].value+"' width=500 height=500 frameBorder='0'></iframe>";
+	document.getElementById("map").setAttribute("hidden",true);
+	document.getElementById("otherdata").removeAttribute("hidden");
+}
+
 function makeDynamicLink(town)
 {
 	document.getElementById("otherdata").innerHTML = "<iframe src='twwb-game.php?action=loadTown&town="+town+"' width=500 height=500 frameBorder='0'></iframe>";
 	document.getElementById("map").setAttribute("hidden",true);
 	document.getElementById("otherdata").removeAttribute("hidden");
 }
+function runFeat(feat)
+{
+	fetch("twwb-game.php?action=doFeat&feat="+feat);
+	profile();
+	
+}
+
 function getTownByName(name)
 {
 	return fileStore.find(x => x["realName"] == name);
+}
+function getMarkerByName(name)
+{
+	return markers.find(x => x.options.title == name);
 }
 getFile("dumps/town_dump.txt");
 setTimeout(loadMap,1000);

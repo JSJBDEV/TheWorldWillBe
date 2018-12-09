@@ -70,6 +70,8 @@ def genTownForYear():
         val = (townObject["realName"],townObject["realCountry"],townObject["realRegion"],townObject["foundedYear"],townObject["latitude"],townObject["longitude"],townObject["townseed"],townObject["happiness"],townObject["devLevel"],townObject["culture"],townObject["military"],townObject["population"],townObject["foodMod"],townObject["resources"],townObject["branchedFrom"],townObject["partOf"])
         cursor.execute(sql,val)
         database.commit()
+        cursor.execute("SELECT townID from towns ORDER BY townID DESC LIMIT 1")
+        towns[len(towns)-1]["townId"] = cursor.fetchone()[0]
     
 
 def genBranchTown(parent):
@@ -108,6 +110,8 @@ def genBranchTown(parent):
     val = (townObject["realName"],townObject["realCountry"],townObject["realRegion"],townObject["foundedYear"],townObject["latitude"],townObject["longitude"],townObject["townseed"],townObject["happiness"],townObject["devLevel"],townObject["culture"],townObject["military"],townObject["population"],townObject["foodMod"],townObject["resources"],townObject["branchedFrom"],townObject["partOf"])
     cursor.execute(sql,val)
     database.commit()
+    cursor.execute("SELECT townID from towns ORDER BY townID DESC LIMIT 1")
+    towns[len(towns)-1]["townId"] = cursor.fetchone()[0]
     
     parent["resources"] = parent["resources"] + townObject["resources"]
 
@@ -156,6 +160,9 @@ def genColonyTown(parent):
     val = (townObject["realName"],townObject["realCountry"],townObject["realRegion"],townObject["foundedYear"],townObject["latitude"],townObject["longitude"],townObject["townseed"],townObject["happiness"],townObject["devLevel"],townObject["culture"],townObject["military"],townObject["population"],townObject["foodMod"],townObject["resources"],townObject["branchedFrom"],townObject["partOf"])
     cursor.execute(sql,val)
     database.commit()
+    cursor.execute("SELECT townID from towns ORDER BY townID DESC LIMIT 1")
+    towns[len(towns)-1]["townId"] = cursor.fetchone()[0]
+    
     
 
 def townIterate():
@@ -246,8 +253,8 @@ def townIterate():
             
             server.append(town["realName"])
             server.append("#")
-            sql = "DELETE FROM towns WHERE realName = %s"
-            val = (t["realName"],)
+            sql = "DELETE FROM towns WHERE townID = %s"
+            val = (t["townId"],)
             cursor.execute(sql,val)
             database.commit()
             towns.remove(t)
@@ -270,7 +277,12 @@ def haversine(lat1,long1,lat2,long2):
     return d
 def getTownByRealName(name):
     for town in towns:
-        if town["realName"]:
+        if town["realName"] == name:
+            return town
+        
+def getTownById(IDin):
+    for town in towns:
+        if town["townId"] == IDin:
             return town
 
 def removeTownsInNation(townIn):
@@ -281,8 +293,8 @@ def removeTownsInNation(townIn):
             server.append(town["realName"])
             server.append("#")
             server.append("#")
-            sql = "DELETE FROM towns WHERE realName = %s"
-            val = (town["realName"],)
+            sql = "DELETE FROM towns WHERE townID = %s"
+            val = (town["townId"],)
             cursor.execute(sql,val)
             database.commit()
             towns.remove(town)
@@ -297,12 +309,7 @@ def serverYear(yearz):
         townIterate()
         year = year + 1
         send.append("$")
-    townfile = open("dumps/town_dump.txt","w+")
-    townfile.write(json.dumps(towns))
-    townfile.close()
-    yearfile = open("dumps/year_dump.txt","w+")
-    yearfile.write(str(year))
-    yearfile.close()
+    commit()
     return towns
 
 
@@ -314,12 +321,7 @@ def nextYear():
     year = int(yearfile.read())
     year = year + 1
     send.append("$")
-    townfile = open("dumps/town_dump.txt","w+")
-    townfile.write(json.dumps(towns))
-    townfile.close()
-    yearfile = open("dumps/year_dump.txt","w+")
-    yearfile.write(str(year))
-    yearfile.close()
+    commit()
     return towns
 
 def restartServer():
@@ -328,3 +330,11 @@ def restartServer():
     year = int(yearfile.read())
     townfile = open("dumps/town_dump.txt","r+")
     towns = json.loads(townfile.read())
+
+def commit():
+    townfile = open("dumps/town_dump.txt","w+")
+    townfile.write(json.dumps(towns))
+    townfile.close()
+    yearfile = open("dumps/year_dump.txt","w+")
+    yearfile.write(str(year))
+    yearfile.close()
