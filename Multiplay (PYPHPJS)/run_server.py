@@ -61,7 +61,12 @@ while True:
             cursor.execute(sql,val)
             effect = cursor.fetchone()[0]
             feat = effect.split(",")
-            incrementValue(task[2],feat[0],feat[1])
+            if len(feat) == 2:
+                incrementValue(task[2],feat[0],feat[1])
+            if len(feat) > 2:
+                incrementValue(task[2],feat[2],feat[3])
+            if len(feat) > 4:
+                incrementValue(task[2],feat[4,feat[5])
             sql = "DELETE FROM tasks WHERE taskID=%s"
             val = (task[0],)
             cursor.execute(sql,val)
