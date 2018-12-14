@@ -53,7 +53,7 @@ switch($action)
 			}
 			else
 			{
-				print("feat in progress");
+				print("<br> feat in progress");
 			}
 			
 			
@@ -61,10 +61,28 @@ switch($action)
 		
 		echo($location);
 		break;
+	
+	case "viewProfile":
+		$userid = htmlspecialchars($_GET["userid"]);
+		$result = mysqli_query($connection,"SELECT * FROM `twwb`.`users` WHERE userID = '".$userid."';");
+		while($row = mysqli_fetch_assoc($result))
+		{
+			print("Username: <b>".$row["userName"]."</b><br>");
+			print("<img src=".$row["userIcon"]."alt='icon' width='100' height='100'>");
+			print("<br>Original Country: <b>".$row["userTrueCountry"]."</b>");
+			print("<br>Date Joined: <b>".$row["userCreated"]."</b>");
+			$res = mysqli_fetch_row(mysqli_query($connection,"SELECT realName FROM towns WHERE townID=".$row["userResidency"].";"))[0];
+			print("<br><br>Current Residency:<button onclick=window.parent.makeDynamicLink('".$row["userResidency"]."')> <b>".$res."</b></button>");
+			$loc = mysqli_fetch_row(mysqli_query($connection,"SELECT realName FROM towns WHERE townID='".$row["userLocation"]."';"))[0];
+			print("<br>Current Location:<button onclick=window.parent.makeDynamicLink('".$row["userLocation"]."')> <b>".$loc."</b></button>");
+		}
+		break;
+	
 		
 	case "move":
 		$newLocation = htmlspecialchars($_GET["newLocation"]);
 		$result = mysqli_query($connection,"UPDATE users SET userLocation='".$newLocation."' WHERE userIP = '".$ip."';");
+		print("Location Changed");
 		break;
 		
 	case "doFeat":
@@ -150,6 +168,26 @@ switch($action)
 		
 		}
 		break;
+	case "search":
+		print("<input id='searchbar' class='w3-input w3-border' type='text'>"."<button onclick='window.parent.searchFor()' class='w3-btn w3-blue-grey'>Search...</button>");
+		$query = htmlspecialchars($_GET["query"]);
+		if($query != ".")
+		{
+			$result = mysqli_query($connection,"SELECT * FROM users WHERE userName LIKE '%".$query."%';");
+			print("<br>==PLAYERS==<br><table class='w3-striped'>");
+			while($row = mysqli_fetch_assoc($result))
+			{
+				print("<tr><td><button class='w3-btn w3-white w3-border w3-border-blue w3-round' onclick='window.parent.otherProfile(".$row["userID"].")'>".$row["userName"]."</button></td></tr>");
+			}
+			$result = mysqli_query($connection,"SELECT * FROM towns WHERE realName LIKE '%".$query."%';");
+			print("</table><br>==TOWNS==<br><table>");
+			while($row = mysqli_fetch_assoc($result))
+			{
+				print("<tr><td><button class='w3-btn w3-white w3-border w3-border-blue w3-round' onclick='window.parent.makeDynamicLink(".$row["townID"].")'>".$row["realName"]."</button></td></tr>");
+			}
+			print("</table>");
+		}
+		
 }
 
 

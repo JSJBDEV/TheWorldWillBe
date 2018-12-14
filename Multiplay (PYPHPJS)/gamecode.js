@@ -105,6 +105,12 @@ function profile()
 	
 	
 }
+function otherProfile(other)
+{
+	document.getElementById("otherdata").innerHTML = "<iframe src='twwb-game.php?action=viewProfile&userid="+other+"' width=500 height=500 frameBorder='0'></iframe>";
+	document.getElementById("map").setAttribute("hidden",true);
+	document.getElementById("otherdata").removeAttribute("hidden");
+}
 function getMap()
 {
 	document.getElementById("map").removeAttribute("hidden");
@@ -114,6 +120,12 @@ function getMap()
 function getStats()
 {
 	document.getElementById("otherdata").innerHTML = "<iframe id=statframe src='twwb-game.php?action=stats&stat=dev' width=500 height=500 frameBorder='0'></iframe>";
+	document.getElementById("map").setAttribute("hidden",true);
+	document.getElementById("otherdata").removeAttribute("hidden");
+}
+function getSearch()
+{
+	document.getElementById("otherdata").innerHTML = "<iframe id=searchframe src='twwb-game.php?action=search&query=.' width=500 height=500 frameBorder='0'></iframe>";
 	document.getElementById("map").setAttribute("hidden",true);
 	document.getElementById("otherdata").removeAttribute("hidden");
 }
@@ -155,7 +167,8 @@ function lookup()
 }
 
 function makeDynamicLink(town)
-{
+{	
+	map.panTo(getMarkerByName(town)._latlng);
 	document.getElementById("otherdata").innerHTML = "<iframe src='twwb-game.php?action=loadTown&town="+town+"' width=500 height=500 frameBorder='0'></iframe>";
 	document.getElementById("map").setAttribute("hidden",true);
 	document.getElementById("otherdata").removeAttribute("hidden");
@@ -164,6 +177,16 @@ function runFeat(feat)
 {
 	fetch("twwb-game.php?action=doFeat&feat="+feat);
 	profile();
+	
+}
+function searchFor()
+{
+	
+	var query = document.getElementById("searchframe").contentWindow.document.getElementById("searchbar").value;
+	document.getElementById("otherdata").innerHTML = "<iframe id=searchframe src='twwb-game.php?action=search&query="+query+"' width=500 height=500 frameBorder='0'></iframe>";
+	document.getElementById("map").setAttribute("hidden",true);
+	document.getElementById("otherdata").removeAttribute("hidden");
+	
 	
 }
 
