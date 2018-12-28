@@ -128,6 +128,7 @@ switch($action)
 			
 			
 			print("<br><button class='w3-circle w3-hover-teal' onclick='window.parent.switchLocation(".'"'.$row["townID"].'"'.")' class='w3-btn w3-blue-grey'>Travel</button>");
+			print("<button class='w3-circle w3-hover-teal' onclick='window.parent.showLocation(".'"'.$row["townID"].'"'.")' class='w3-btn w3-blue-grey'>Show</button>");
 		}
 		break;
 		

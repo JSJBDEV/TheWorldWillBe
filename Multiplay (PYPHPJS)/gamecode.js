@@ -155,6 +155,15 @@ function switchLocation(newLoc)
 	document.getElementById("map").removeAttribute("hidden");
 	document.getElementById("otherdata").setAttribute("hidden",true);
 	map.panTo(getMarkerByName(newLoc)._latlng);
+	map.setZoom(5);
+	
+}
+function showLocation(newLoc)
+{	
+	document.getElementById("map").removeAttribute("hidden");
+	document.getElementById("otherdata").setAttribute("hidden",true);
+	map.panTo(getMarkerByName(newLoc)._latlng);
+	map.setZoom(5);
 	
 }
 
