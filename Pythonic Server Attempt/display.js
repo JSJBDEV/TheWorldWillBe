@@ -259,5 +259,8 @@ function loadExamine()
 }
 function runSimForLen()
 {
-	getFile("testingpy.php?length="+document.getElementById("forLen").value+"&town=NA&option=simple-seed&seed="+document.getElementById("seed").value);
+	if(Number.isInteger(document.getElementById("forLen").value) && Number.isInteger(document.getElementById("seed").value))
+	{
+		getFile("testingpy.php?length="+document.getElementById("forLen").value+"&town=NA&option=simple-seed&seed="+document.getElementById("seed").value);
+	}
 }
