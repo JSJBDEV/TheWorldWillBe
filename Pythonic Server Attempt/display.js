@@ -259,8 +259,5 @@ function loadExamine()
 }
 function runSimForLen()
 {
-	if(Number.isInteger(document.getElementById("forLen").value) && Number.isInteger(document.getElementById("seed").value))
-	{
-		getFile("testingpy.php?length="+document.getElementById("forLen").value+"&town=NA&option=simple-seed&seed="+document.getElementById("seed").value);
-	}
+	getFile("testingpy.php?length="+document.getElementById("forLen").value+"&town=NA&option=simple-seed&seed="+document.getElementById("seed").value);
 }
