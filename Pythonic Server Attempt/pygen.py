@@ -13,7 +13,7 @@ parser.add_argument("--seed",help = "changes the seed for the simulation, defaul
 args = parser.parse_args()
 runLength = args.years
 
-def baseGenerator(year):
+def baseGenerator(year): #pseudorandom number generation using the congruential algorithm, x+A*B%M
     if(args.seed):
         seed = int(args.seed)
     else:
@@ -26,7 +26,7 @@ def baseGenerator(year):
     return seed
 
 
-def fitRecursively(inp,lim):
+def fitRecursively(inp,lim): #makes numbers smaller numbers by minusing the number by other numbers.
     while inp >= lim:
         inp = inp - lim
     return inp
@@ -39,7 +39,7 @@ def getFile(filename):
 
 
 
-def genTownForYear():
+def genTownForYear(): #does an equivilent to creating a town object.
     seed = baseGenerator(year)
     if int(str(seed)[0:2])>70:
         file = getFile("numberofcities.txt")
@@ -74,7 +74,7 @@ def genTownForYear():
         send.append(townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"])
     
 
-def genBranchTown(parent):
+def genBranchTown(parent): #same as above but with some slight modifications, effectively inheriting from the MainTown Object.
     seed = baseGenerator(year)
     file = getFile("countries/"+parent["realCountry"]+".txt")
     region = []
@@ -107,7 +107,7 @@ def genBranchTown(parent):
     send.append("~"+townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"]+","+townObject["branchedFrom"]+","+townObject["partOf"])
     parent["resources"] = parent["resources"] + townObject["resources"]
 
-def genColonyTown(parent):
+def genColonyTown(parent): #again the same a "subclass" of town
     seed = baseGenerator(year)
     test = getFile("compare.txt")
     close = []
@@ -149,7 +149,7 @@ def genColonyTown(parent):
     send.append("~"+townObject["realName"]+","+townObject["latitude"]+","+townObject["longitude"]+","+townObject["branchedFrom"]+","+townObject["partOf"])
     parent["resources"] = parent["resources"] + townObject["resources"]
 
-def townIterate():
+def townIterate(): #processes each town per year to change stats, obviously this means as more years are generated the time gets exponentionally longer.
     for town in towns:
         #print(town)
         try:
@@ -223,7 +223,7 @@ def townIterate():
             towns.remove(t)
     
             
-def haversine(lat1,long1,lat2,long2):
+def haversine(lat1,long1,lat2,long2): #for calculating distances using lattitude and longitiude
     R = 6371e3
     φ1 = math.radians(float(lat1))
     φ2 = math.radians(float(lat2))
@@ -246,7 +246,7 @@ def removeTownsInNation(townIn):
             send.append("#"+town["realName"])
             towns.remove(town)
 
-for year in range(1,int(runLength)):
+for year in range(1,int(runLength)): #initial loop.
     genTownForYear()
     townIterate()
     year = year + 1

@@ -1,6 +1,9 @@
+//These are necessary to use Leaflet properly.
 var markers = [];
 var polygons = [];
 var polylines = [];
+
+//setup the map usiing Leaflet.js
 var map = L.map('map', {
 	minZoom: 1,
 	maxZoom: 16,
@@ -46,6 +49,7 @@ map.setView([0, 0], 0);
 var latlngs = [[37, -109.05],[41, -109.03],[41, -102.05],[37, -102.04]];
 var polygon = L.polygon(latlngs, {color: 'red'}).addTo(map);
 
+
 //funcions by me//
 function addPolygon(latlngs,colour)
 {
@@ -85,9 +89,10 @@ function removeMarker(id)
 
 //-----//
 
+//file storage
 var loadedRes = [];
 var fileStore = [];
-var cyear = 0;
+
 var hasTimeout = false;
 function getFile(url) //using a simple fetch method I can grab my libraries.
 {
@@ -108,7 +113,7 @@ function fetchSimfile(runlength)
 	
 }
 var year = 1;
-function runSim()
+function runSim() //the main running of the simulation
 {
 	if(loadedRes.length < 1)
 	{
@@ -194,13 +199,25 @@ function makeDynamicLink(townName)
 	//document.getElementById("towninfo").innerHTML = "<iframe height=200 width=200 src='testingpy.php?length="+(year+1)+"&option=town&town="+townName.replace(/ /g,"_")+"'></iframe>";
 	
 }
-function pretifyJson(obj)
+function fitRecursively(input,limit)
+{
+	while(input>=limit)
+	{
+		input = input - limit;
+	}
+	return input;
+}
+
+
+function pretifyJson(obj) //makes the json input into a table
 {
 	var tabletext = "<table border='1'>"
 	for(line in obj)
 	{
 		tabletext += "<tr><td>" + line + "</td><td>" + obj[line] + "</td><tr>";
 	}
+	var flagArray = [fitRecursively(parseInt(obj.townseed.substring(0,2)),11),fitRecursively(parseInt(obj.townseed.substring(1,9)),7),fitRecursively(parseInt(obj.townseed.substring(7,3)),7),fitRecursively(parseInt(obj.townseed.substring(2,4)),7),fitRecursively(parseInt(obj.townseed.substring(3,5)),11),fitRecursively(parseInt(obj.townseed.substring(4,6)),7),fitRecursively(parseInt(obj.townseed.substring(5,7)),17),fitRecursively(parseInt(obj.townseed.substring(6,8)),7)];
+	tabletext += "<tr><td><img src='http://flag-designer.appspot.com/gwtflags/SvgFileService?d="+flagArray[0]+"&c1="+flagArray[1]+"&c2="+flagArray[2]+"&c3="+flagArray[3]+"&o="+flagArray[4]+"&c4="+flagArray[5]+"&s="+flagArray[6]+"&c5="+flagArray[7]+"' alt='svg' width='60' height='40'/></td></tr>";
 	tabletext += "</table>";
 	return tabletext;
 	
@@ -211,7 +228,7 @@ function playpause()
 	runSim();
 	
 }
-function examine()
+function examine() //loads the json equivilant to the year of the simulation
 {
 	markers.forEach(function(marker)
 	{
