@@ -39,11 +39,11 @@ var mainTownIcon = L.icon({
 
 map.setView([0, 0], 0);
 
- L.marker([-10.4333333,105.6833333]).addTo(map)
-.bindPopup('<a href="https://earthobservatory.nasa.gov/">NASA</a>');
+ //L.marker([-10.4333333,105.6833333]).addTo(map)
+//.bindPopup('<a href="https://earthobservatory.nasa.gov/">NASA</a>');
 
-var latlngs = [[37, -109.05],[41, -109.03],[41, -102.05],[37, -102.04]];
-var polygon = L.polygon(latlngs, {color: 'red'}).addTo(map);
+//var latlngs = [[37, -109.05],[41, -109.03],[41, -102.05],[37, -102.04]];
+//var polygon = L.polygon(latlngs, {color: 'red'}).addTo(map);
 
 //funcions by me//
 function addPolygon(latlngs,colour)
