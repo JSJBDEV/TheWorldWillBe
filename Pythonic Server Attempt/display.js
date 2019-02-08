@@ -119,14 +119,14 @@ function runSim()
 	if(process[0] == "~") //symbolises a branched town
 	{
 		mark = process.substring(1).split(",");
-		console.log(mark[0] +" has branched from "+mark[3]);
+		document.getElementById("yeardata").innerHTML+="<br>"+(mark[0] +" has branched from "+mark[3]);
 		addMarker(mark[0],mark[4],subTownIcon,mark[1],mark[2],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+mark[0]+'"'+")'>"+mark[0]+"</a><br>");
 		addPolyline(mark[3],[[mark[1],mark[2]],[getMarkerByName(mark[3])._latlng.lat,getMarkerByName(mark[3])._latlng.lng]],"red");
 		
 	}
 	else if(process[0] == "#") //symbolises a marker to be removed
 	{
-		console.log(process.substring(1)+" has fallen")
+		document.getElementById("yeardata").innerHTML+="<br>"+(process.substring(1)+" has fallen")
 		markers.forEach(function(marker)
 		{
 			if(marker.options.title == process.substring(1))
@@ -155,20 +155,20 @@ function runSim()
 	{
 		year++;
 		document.getElementById("year").innerHTML="Year: "+year;
-		console.log("@@@year: "+year+" @@@");
+		document.getElementById("yeardata").innerHTML+="<br>"+("@@@year: "+year+" @@@");
 	}
 	else if(process[0] == ".")
 	{
-		console.log("---battle started---");
+		document.getElementById("yeardata").innerHTML+="<br>"+("---battle started---");
 	}
 	else if(process[0] == ",")
 	{
-		console.log("===battle ended===");
+		document.getElementById("yeardata").innerHTML+="<br>"+("===battle ended===");
 	}
 	else //refers to a normally generated town
 	{
 		mark = process.split(",");
-		console.log(mark[0]+ " has risen!");
+		document.getElementById("yeardata").innerHTML+="<br>"+(mark[0]+ " has risen!");
 		addMarker(mark[0],mark[0],mainTownIcon,mark[1],mark[2],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+mark[0]+'"'+")'>"+mark[0]+"</a><br>");
 	}
 	loadedRes.shift();
@@ -224,7 +224,7 @@ function examine()
 	});
 	fileStore.forEach(function(town)
 	{
-		console.log(town["realName"]);
+		document.getElementById("yeardata").innerHTML+="<br>"+(town["realName"]);
 		if(town["branchedFrom"] == "NA")
 		{
 			addMarker(town["realName"],town["partOf"],mainTownIcon,town["latitude"],town["longitude"],"<a href='javascript:void(0)' onclick='makeDynamicLink("+'"'+town["realName"]+'"'+")'>"+town["realName"]+"</a><br>");
